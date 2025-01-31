@@ -45,7 +45,7 @@ namespace TextRPG
         public string Name { get; set; } = string.Empty;
         public string ItemInfo { get; set; } = string.Empty;
         public int Gold { get; set; } = 100;
-        public bool IsSell { get; set; } = false;
+        //public bool IsSell { get; set; } = false;
         public float Power { get; set; } = 0f;
         public float Defense { get; set; } = 0f;
         public ItemType Type { get; set; }
@@ -57,11 +57,13 @@ namespace TextRPG
     public class ItemManager
     {
         private Item[] Items { get; set; }
-        public event Func<int, bool> BuyAndSell;
+        public event Func<int, bool> BuyAndSell;    //장비 구매
+        public event Action<float, ItemType> EquipItemEvent;
+        public int OwnedItemCount;   //소유 아이템 갯수
 
         public ItemManager()
         {
-
+            OwnedItemCount = 0;
             Items = new Item[6];
 
             for (int i = 0; i < Items.Length; i++)
@@ -72,19 +74,19 @@ namespace TextRPG
             //방어구
             Items[0].Name = "수련자 갑옷";
             Items[0].Defense = 5f;
-            Items[0].ItemInfo = "쉽게 볼 수 있는 낡은 검 입니다.";
+            Items[0].ItemInfo = "무쇠로 만들어져 튼튼한 갑옷입니다.";
             Items[0].Gold = 1000;
             Items[0].Type = ItemType.Armor;
 
             Items[1].Name = "무쇠갑옷";
             Items[1].Defense = 9f;
-            Items[1].ItemInfo = "어디선가 사용됐던거 같은 도끼입니다.";
+            Items[1].ItemInfo = "무쇠로 만들어져 튼튼한 갑옷입니다. ";
             Items[1].Gold = 1800;
             Items[1].Type = ItemType.Armor;
 
             Items[2].Name = "스파르타의 갑옷";
             Items[2].Defense = 15f;
-            Items[2].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 창입니다.";
+            Items[2].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.";
             Items[2].Gold = 3500;
             Items[2].Type = ItemType.Armor;
 
@@ -133,7 +135,7 @@ namespace TextRPG
                 Console.SetCursorPosition(90, top + i);
                 Console.Write(" | ");
 
-                if (Items[i].IsSell == true)
+                if (Items[i].State == ItemState.Have)
                     Console.WriteLine("판매완료");
                 else
                     Console.WriteLine(Items[i].Gold + " G");
@@ -142,15 +144,40 @@ namespace TextRPG
 
         }
         
-        public void ShowInventory(int top)
+        public void ShowInventory(int top, bool IsEquipmentMode)
         {
             int count = 0;
 
+            //보유 중인 아이템을 전부 보여줍니다.
+            //이때 장착중인 아이템 앞에는 [E] 표시를 붙여 줍니다.
             for (int i = 0; i < Items.Length; i++)
             {
-                if (Items[i].State == ItemState.Use)
+                if (Items[i].State != ItemState.HaveNot)
                 {
-                    Console.SetCursorPosition(0, top + count);
+                    //만약 장비 관리로 진입했다면
+                    if(IsEquipmentMode)
+                    {
+                        //숫자 표시
+                        Console.SetCursorPosition(1, top + count);
+                        Console.Write($"{i + 1} ");
+                    }
+                    //아직 인벤토리라면
+                    else
+                    {
+                        //숫자 없음
+                        Console.SetCursorPosition(3, top + count);
+                    }
+
+                    //착용중인 장비인지 확인
+                    if (Items[i].State == ItemState.Use)
+                    {
+                        Console.Write($"[E] ");
+                    }
+                    else
+                    {
+                        Console.Write($" -  ");
+                    }
+
                     Console.Write(Items[i].Name);
 
                     Console.SetCursorPosition(18, top + count);
@@ -165,20 +192,37 @@ namespace TextRPG
                     Console.SetCursorPosition(32, top + count);
                     Console.Write(" | ");
 
-                    Console.Write(Items[i].ItemInfo);
-
-                    Console.SetCursorPosition(90, top + count);
-                    Console.Write(" | ");
-
-                    if (Items[i].IsSell == true)
-                        Console.WriteLine("판매완료");
-                    else
-                        Console.WriteLine(Items[i].Gold + " G");
+                    Console.WriteLine(Items[i].ItemInfo);
 
                     count++;
                 }
             }
         }
+
+        //장비 착용 메서드
+        public void WearEquipment(int select)
+        {
+
+            if (Items[select - 1].State == ItemState.Use) 
+            {
+                Items[select - 1].State = ItemState.Have;
+
+                if(Items[select - 1].Type == ItemType.Weapon)
+                          EquipItemEvent?.Invoke(Items[select - 1].Power, Items[select - 1].Type)
+            }
+            else if (Items[select - 1].State == ItemState.Have)
+            {
+                Items[select - 1].State = ItemState.Use;
+            }
+            else
+            {
+                Console.WriteLine("오류: 가진적 없는 장비를 장착하려함");
+            }
+
+        }
+
+
+
 
         //아이템 구매
         public bool SellItems(int select)
@@ -187,15 +231,27 @@ namespace TextRPG
             {
 
                 bool HasEnoughGold = BuyAndSell.Invoke(Items[select - 1].Gold);
+                
+                if(HasEnoughGold)
+                {
+                    Console.WriteLine($"\n{Items[select - 1].Name}을(를) 성공적으로 구매했습니다!");
+                    Items[select - 1].State = ItemState.Have;
+                    OwnedItemCount++;
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    Console.WriteLine("\nGold 가 부족합니다.");
+                    Thread.Sleep(1000);
+                }
+
                 return HasEnoughGold;
 
-                //아이템을 구매한 상태가 아니고,
-                //플레이어의 소지금이 아이템의 가격보다 많다면
-                //구매
             }
             else
             {
-                Console.WriteLine("이미 구매한 아이템입니다.");
+                Console.WriteLine("\n이미 구매한 아이템입니다.");
+                Thread.Sleep(1000);
                 return false;
             }
         }
@@ -228,6 +284,10 @@ namespace TextRPG
             }
         }
 
+        public int ItemPow { get; set; }
+        public int ItemDef { get; set; }
+
+
         public Player()
         {
             name = "플레이어";
@@ -238,25 +298,52 @@ namespace TextRPG
             Level = 1;
             Job = "직업";
             gold = 1000;
+
+            ItemPow = 0;
+            ItemDef = 0;
         }
 
         public bool BuyItem(int price)
         {
             if(price > gold)
             {
-                Console.WriteLine("소지 골드가 부족합니다.");
                 return false;
             }
             else
             {
                 Gold -= price;
-                Console.WriteLine("소지 골드가 부족합니다.");
                 return true;
             }
-
-            
+ 
         }
 
+
+        //일어나서 이 메서드들 수정하기
+        //Use/Disuse가 아니라 Weapon/Armor로 분류해야할...듯?
+        //일단 일어나고 다시 생각해보기
+        public void UseItem(float stats, ItemType type)
+        {
+            if(type == ItemType.Weapon)
+            {
+                power += stats;
+            }
+            else if(type == ItemType.Armor)
+            {
+                defense += stats;
+            }
+        }
+
+        public void DisuseItem(float stats, ItemType type)
+        {
+            if (type == ItemType.Weapon)
+            {
+                power -= stats;
+            }
+            else if (type == ItemType.Armor)
+            {
+                defense -= stats;
+            }
+        }
 
 
     }
@@ -272,7 +359,7 @@ namespace TextRPG
             itemManager = new ItemManager();
 
             itemManager.BuyAndSell += player.BuyItem;
-            //itemManager.BuyAndSell += ItemShop_Buy();
+            itemManager.EquipItemEvent += player.UseItem;
         }
 
         //키 입력을 받고 올바른 입력인지 체크하는 메서드
@@ -333,8 +420,8 @@ namespace TextRPG
 
             Console.WriteLine($"Lv. {player.Level}");
             Console.WriteLine($"{player.name} ( {player.Job} )");
-            Console.WriteLine($"공격력 : {player.power}");
-            Console.WriteLine($"방어력 : {player.defense}");
+            Console.WriteLine($"공격력 : {player.power} (+{player.ItemPow})");
+            Console.WriteLine($"방어력 : {player.defense} (+{player.ItemDef})");
             Console.WriteLine($"체 력 : {player.hp}");
             Console.WriteLine($"Gold : {player.Gold} G");
 
@@ -343,7 +430,6 @@ namespace TextRPG
 
             if (input == -1) StatusCheck();
             else GameStart();
-
 
         }
         
@@ -358,7 +444,8 @@ namespace TextRPG
             Console.WriteLine("[아이템 목록]\n");
 
             //아이템 목록 출력
-            itemManager.ShowInventory(5);
+            //장비 관리에 들어갈 때만 true를 넣어준다.
+            itemManager.ShowInventory(4, false);
 
             Console.WriteLine("\n1. 장착 관리");
             Console.WriteLine("0. 나가기");
@@ -370,7 +457,7 @@ namespace TextRPG
 
         }
 
-        //장착 관리
+        //장비 장착 관리
         public void EquipItem()
         {
 
@@ -378,18 +465,22 @@ namespace TextRPG
             Console.WriteLine("인벤토리 - 장착 관리");
             Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.\n");
 
-            Console.WriteLine("[아이템 목록]\n");
+            Console.WriteLine("[아이템 목록]");
 
             //아이템 목록 출력
-            //itemManager.ShowItemList();
+            //장비 관리에 들어갈 때만 true를 넣어준다.
+            itemManager.ShowInventory(4, true);
 
             Console.WriteLine("\n0. 나가기");
-            int input = InputCheck(0, 1);
+            int input = InputCheck(0, itemManager.OwnedItemCount+1);
 
             if (input == -1) EquipItem();
-            else Inventory();
-
-
+            else if(input == 0) Inventory();
+            else
+            {
+                itemManager.WearEquipment(input);
+                EquipItem();
+            }
         }
 
         //상점
@@ -442,16 +533,13 @@ namespace TextRPG
             else if(input == 0) ItemShop();
             else
             {
-                bool HasEnoughGold = itemManager.SellItems(input);
+                itemManager.SellItems(input);
                 ItemShop_Buy();
             }
-                
 
         }
 
-
     }
-
 
 
     internal class Program
