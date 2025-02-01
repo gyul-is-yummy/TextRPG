@@ -42,7 +42,7 @@ namespace TextRPG.Models
             speed = 1f;
             Level = 1;
             Job = "직업";
-            gold = 1000;
+            gold = 100000;
 
             ItemPow = 0f;
             ItemDef = 0f;

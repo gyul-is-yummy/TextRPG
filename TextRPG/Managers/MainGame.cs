@@ -184,7 +184,7 @@ namespace TextRPG.Managers
             itemManager.ShowItemList(7, true);
 
             Console.WriteLine("\n0. 나가기");
-            int input = InputCheck(0, 6);
+            int input = InputCheck(0, itemManager.ItemCount);
 
             if (input == -1) ItemShop_Buy();
             else if (input == 0) ItemShop();

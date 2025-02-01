@@ -11,7 +11,10 @@ namespace TextRPG.Managers
     public class ItemManager
     {
         
-        public int OwnedItemCount;  //소유 아이템 갯수
+        public int OwnedItemCount { get; set; }
+        public int ItemCount {  get; private set; }
+
+
 
         private Item[] Items { get; set; }  // 아이템 정보를 저장할 배열
 
@@ -24,7 +27,8 @@ namespace TextRPG.Managers
         public ItemManager()
         {
             OwnedItemCount = 0;
-            Items = new Item[6];
+            ItemCount = 9;
+            Items = new Item[ItemCount];
 
             for (int i = 0; i < Items.Length; i++)
             {
@@ -74,52 +78,84 @@ namespace TextRPG.Managers
             Items[5].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 창입니다.";
             Items[5].Gold = 2700;
             Items[5].Type = ItemType.Weapon;
+
+            //악세서리
+            Items[6].Name = "나무 목걸이";
+            Items[6].Power = 3f;
+            Items[6].Defense = 3f;
+            Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
+            Items[6].Gold = 2700;
+            Items[6].Type = ItemType.Accessories;
+
+            Items[7].Name = "누군가의 은반지";
+            Items[7].Power = 6f;
+            Items[7].Defense = 6f;
+            Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
+            Items[7].Gold = 2700;
+            Items[7].Type = ItemType.Accessories;
+
+            Items[8].Name = "스파르타의 허리띠";
+            Items[8].Power = 9f;
+            Items[8].Defense = 9f;
+            Items[8].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 허리띠입니다.";
+            Items[8].Gold = 2700;
+            Items[8].Type = ItemType.Accessories;
+
         }
 
 
         //상점에서 아이템 리스트를 보여주는 메서드
         public void ShowItemList(int top, bool IsBuyMode)
         {
+            int x = top;
+
             //아이템 목록 출력
             for (int i = 0; i < Items.Length; i++)
             {
+                x++;
+
                 //만약 아이템 구매로 진입했다면
                 if (IsBuyMode)
                 {
                     //숫자 표시
-                    Console.SetCursorPosition(1, top + i);
+                    Console.SetCursorPosition(1, x);
                     Console.Write($"{i + 1}  ");
                 }
                 //아직 인벤토리라면
                 else
                 {
                     //숫자 없음
-                    Console.SetCursorPosition(4, top + i);
+                    Console.SetCursorPosition(4, x);
                 }
 
                 Console.Write(Items[i].Name);
 
-                Console.SetCursorPosition(18, top + i);
-                Console.Write(" | ");
-
-                if (Items[i].Type == ItemType.Weapon)
-                    Console.Write("공격력 +{0}", Items[i].Power);
-
-                else if (Items[i].Type == ItemType.Armor)
-                    Console.Write("방어력 +{0}", Items[i].Defense);
-
-                Console.SetCursorPosition(32, top + i);
+                Console.SetCursorPosition(23, x);
+                Console.Write("| 공격력 +{0}", Items[i].Power);
+                Console.SetCursorPosition(35, x);
+                Console.Write(" 방어력 +{0} ", Items[i].Defense);
+                    
+                Console.SetCursorPosition(46, x);
                 Console.Write(" | ");
 
                 Console.Write(Items[i].ItemInfo);
 
-                Console.SetCursorPosition(90, top + i);
+                Console.SetCursorPosition(103, x);
                 Console.Write(" | ");
 
                 if (Items[i].State == ItemState.Have)
                     Console.WriteLine("판매완료");
                 else
-                    Console.WriteLine(Items[i].Gold + " G");
+                {
+                    Console.Write(Items[i].Gold);
+                    Console.SetCursorPosition(111, x);
+                    Console.WriteLine("G");
+                }
+
+                if ((i + 1) % 3 == 0) 
+                {
+                    x++;
+                }
 
             }
 
@@ -166,13 +202,14 @@ namespace TextRPG.Managers
                     Console.SetCursorPosition(18, top + count);
                     Console.Write(" | ");
 
-                    if (Items[i].Type == ItemType.Weapon)
-                        Console.Write("공격력 +{0}", Items[i].Power);
-
-                    else if (Items[i].Type == ItemType.Armor)
-                        Console.Write("방어력 +{0}", Items[i].Defense);
+                    Console.Write("공격력 +{0}", Items[i].Power);
 
                     Console.SetCursorPosition(32, top + count);
+                    Console.Write("방어력 +{0}", Items[i].Defense);
+
+                        
+
+                    
                     Console.Write(" | ");
 
                     Console.WriteLine(Items[i].ItemInfo);
