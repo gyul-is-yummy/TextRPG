@@ -17,8 +17,10 @@ namespace TextRPG.Managers
             player = new Player();
             itemManager = new ItemManager();
 
+            // Event 연결
             itemManager.BuyAndSell += player.BuyItem;
-            itemManager.EquipItemEvent += player.UseItem;
+            itemManager.EquipEvent += player.UseItem;
+            itemManager.UnequipEvent += player.DisuseItem;
         }
 
         //키 입력을 받고 올바른 입력인지 체크하는 메서드
@@ -44,7 +46,6 @@ namespace TextRPG.Managers
         // 게임 시작 화면
         public void GameStart()
         {
-
             Console.Clear();
             Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
             Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.\n");
@@ -117,7 +118,6 @@ namespace TextRPG.Managers
         //장비 장착 관리
         public void EquipItem()
         {
-
             Console.Clear();
             Console.WriteLine("인벤토리 - 장착 관리");
             Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.\n");
@@ -143,7 +143,6 @@ namespace TextRPG.Managers
         //상점
         public void ItemShop()
         {
-
             Console.Clear();
             Console.WriteLine("상점");
             Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.\n");
@@ -165,7 +164,6 @@ namespace TextRPG.Managers
             if (input == -1) ItemShop();
             else if (input == 1) ItemShop_Buy();
             else GameStart();
-
 
         }
 

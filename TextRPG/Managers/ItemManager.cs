@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,10 +10,15 @@ namespace TextRPG.Managers
 {
     public class ItemManager
     {
-        private Item[] Items { get; set; }
-        public event Func<int, bool> BuyAndSell;    //장비 구매
-        public event Action<float, ItemType> EquipItemEvent;
-        public int OwnedItemCount;   //소유 아이템 갯수
+        
+        public int OwnedItemCount;  //소유 아이템 갯수
+
+        private Item[] Items { get; set; }  // 아이템 정보를 저장할 배열
+
+        //Event
+        public event Func<int, bool> BuyAndSell;            //장비 구매
+        public event Action<float, float> EquipEvent;    //장비 착용
+        public event Action<float, float> UnequipEvent;  //장비 해제
 
         //ItemManager생성자에서는 주로 아이템의 정보를 넣어줌
         public ItemManager()
@@ -27,18 +33,21 @@ namespace TextRPG.Managers
 
             //방어구
             Items[0].Name = "수련자 갑옷";
+            Items[0].Power = 0f;
             Items[0].Defense = 5f;
             Items[0].ItemInfo = "무쇠로 만들어져 튼튼한 갑옷입니다.";
             Items[0].Gold = 1000;
             Items[0].Type = ItemType.Armor;
 
             Items[1].Name = "무쇠갑옷";
+            Items[1].Power = 0f;
             Items[1].Defense = 9f;
             Items[1].ItemInfo = "무쇠로 만들어져 튼튼한 갑옷입니다. ";
             Items[1].Gold = 1800;
             Items[1].Type = ItemType.Armor;
 
             Items[2].Name = "스파르타의 갑옷";
+            Items[2].Power = 0f;
             Items[2].Defense = 15f;
             Items[2].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.";
             Items[2].Gold = 3500;
@@ -47,18 +56,21 @@ namespace TextRPG.Managers
             //무기
             Items[3].Name = "낡은 검";
             Items[3].Power = 2f;
+            Items[3].Defense = 0f;
             Items[3].ItemInfo = "쉽게 볼 수 있는 낡은 검 입니다.";
             Items[3].Gold = 600;
             Items[3].Type = ItemType.Weapon;
 
             Items[4].Name = "청동 도끼";
             Items[4].Power = 5f;
+            Items[4].Defense = 0f;
             Items[4].ItemInfo = "어디선가 사용됐던거 같은 도끼입니다.";
             Items[4].Gold = 1500;
             Items[4].Type = ItemType.Weapon;
 
             Items[5].Name = "스파르타의 창";
             Items[5].Power = 7f;
+            Items[5].Defense = 0f;
             Items[5].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 창입니다.";
             Items[5].Gold = 2700;
             Items[5].Type = ItemType.Weapon;
@@ -173,39 +185,42 @@ namespace TextRPG.Managers
         //장비 착용 메서드
         public void WearEquipment(int select)
         {
+            int i = select - 1;
 
-            if (Items[select - 1].State == ItemState.Use)
+            //장비를 착용 중인 상태라면
+            if (Items[i].State == ItemState.Use)
             {
-                Items[select - 1].State = ItemState.Have;
-
-                if (Items[select - 1].Type == ItemType.Weapon)
-                    EquipItemEvent?.Invoke(Items[select - 1].Power, Items[select - 1].Type);
+                //해제:
+                UnequipEvent?.Invoke(Items[i].Power, Items[i].Defense);
+                Items[i].State = ItemState.Have;
             }
-            else if (Items[select - 1].State == ItemState.Have)
+            //장비를 착용하지 않은 상태라면
+            else if (Items[i].State == ItemState.Have)
             {
-                Items[select - 1].State = ItemState.Use;
+                //장착:
+                EquipEvent?.Invoke(Items[i].Power, Items[i].Defense);
+                Items[i].State = ItemState.Use;
             }
             else
             {
-                Console.WriteLine("오류: 가진적 없는 장비를 장착하려함");
+                Console.WriteLine("오류: 가진적 없는 장비를 장착하려합니다.");
             }
-
         }
-
 
 
         //아이템 구매
         public bool SellItems(int select)
         {
-            if (Items[select - 1].State == ItemState.HaveNot)
-            {
+            int i = select - 1;
 
-                bool HasEnoughGold = BuyAndSell.Invoke(Items[select - 1].Gold);
+            if (Items[i].State == ItemState.HaveNot)
+            {
+                bool HasEnoughGold = BuyAndSell.Invoke(Items[i].Gold);
 
                 if (HasEnoughGold)
                 {
-                    Console.WriteLine($"\n{Items[select - 1].Name}을(를) 성공적으로 구매했습니다!");
-                    Items[select - 1].State = ItemState.Have;
+                    Console.WriteLine($"\n{Items[i].Name}을(를) 성공적으로 구매했습니다!");
+                    Items[i].State = ItemState.Have;
                     OwnedItemCount++;
                     Thread.Sleep(1000);
                 }

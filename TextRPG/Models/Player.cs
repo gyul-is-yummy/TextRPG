@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,9 +30,8 @@ namespace TextRPG.Models
             }
         }
 
-        public int ItemPow { get; set; }
-        public int ItemDef { get; set; }
-
+        public float ItemPow { get; set; }
+        public float ItemDef { get; set; }
 
         public Player()
         {
@@ -44,8 +44,8 @@ namespace TextRPG.Models
             Job = "직업";
             gold = 1000;
 
-            ItemPow = 0;
-            ItemDef = 0;
+            ItemPow = 0f;
+            ItemDef = 0f;
         }
 
         public bool BuyItem(int price)
@@ -62,32 +62,23 @@ namespace TextRPG.Models
 
         }
 
-
-        //일어나서 이 메서드들 수정하기
-        //Use/Disuse가 아니라 Weapon/Armor로 분류해야할...듯?
-        //일단 일어나고 다시 생각해보기
-        public void UseItem(float stats, ItemType type)
+        //장비 착용 메서드
+        public void UseItem(float pow, float def)
         {
-            if (type == ItemType.Weapon)
-            {
-                power += stats;
-            }
-            else if (type == ItemType.Armor)
-            {
-                defense += stats;
-            }
+            ItemPow += pow;
+            ItemDef += def;
+
+            power += pow;
+            defense += def;
         }
-
-        public void DisuseItem(float stats, ItemType type)
+        //장비 해제 메서드
+        public void DisuseItem(float pow, float def)
         {
-            if (type == ItemType.Weapon)
-            {
-                power -= stats;
-            }
-            else if (type == ItemType.Armor)
-            {
-                defense -= stats;
-            }
+            ItemPow -= pow;
+            ItemDef -= def;
+
+            power -= pow;
+            defense -= def;
         }
     }
 }
