@@ -18,7 +18,8 @@ namespace TextRPG.Managers
             itemManager = new ItemManager();
 
             // Event 연결
-            itemManager.BuyAndSell += player.BuyItem;
+            itemManager.BuyEvent += player.BuyItem;
+            itemManager.SellEvent += player.SellItem;
             itemManager.EquipEvent += player.UseItem;
             itemManager.UnequipEvent += player.DisuseItem;
         }
@@ -192,7 +193,7 @@ namespace TextRPG.Managers
             else if (input == 0) ItemShop();
             else
             {
-                itemManager.SellItems(input);
+                itemManager.BuyItems(input);
                 ItemShop_Buy();
             }
 
@@ -217,14 +218,15 @@ namespace TextRPG.Managers
 
 
             Console.WriteLine("\n0. 나가기");
-            int input = InputCheck(0, itemManager.ItemCount);
+            int input = InputCheck(0, itemManager.OwnedItemCount);
 
-            if (input == -1) ItemShop_Buy();
+            if (input == -1) ItemShop_Sell();
             else if (input == 0) ItemShop();
             else
             {
                 itemManager.SellItems(input);
-                ItemShop_Buy();
+                
+                ItemShop_Sell();
             }
 
         }

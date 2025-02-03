@@ -77,6 +77,19 @@ namespace TextRPG.Models
             }
 
         }
+
+
+        //장비 판매 메서드
+        public int SellItem(int price)
+        {
+            //판매가 설정
+            //아이템은 원가의 85% 가격으로 판매된다.
+            int ItemPrice = (int)(price * 0.85);
+            Gold += ItemPrice;
+
+            return ItemPrice;
+        }
+
         //장비 착용 메서드
         public void UseItem(float pow, float def)
         {

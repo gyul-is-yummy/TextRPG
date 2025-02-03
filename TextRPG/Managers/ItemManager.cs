@@ -17,7 +17,8 @@ namespace TextRPG.Managers
         private Item[] Items { get; set; }  // 아이템 정보를 저장할 배열
 
         //Event
-        public event Func<int, bool> BuyAndSell;         //장비 구매
+        public event Func<int, bool> BuyEvent;           //장비 구매
+        public event Func<int, int> SellEvent;           //장비 판매
         public event Action<float, float> EquipEvent;    //장비 착용
         public event Action<float, float> UnequipEvent;  //장비 해제
 
@@ -141,8 +142,8 @@ namespace TextRPG.Managers
                 Console.SetCursorPosition(103, top);
                 Console.Write(" | ");
 
-                if (Items[i].State == ItemState.Have)
-                    Console.WriteLine("판매완료");
+                if (Items[i].State != ItemState.HaveNot)
+                    Console.WriteLine("구매완료");
                 else
                 {
                     Console.Write(Items[i].Gold);
@@ -202,14 +203,12 @@ namespace TextRPG.Managers
                     
                     Console.Write("공격력 +{0}", Items[i].Power);
 
-                    Console.SetCursorPosition(46, top + count);
+                    Console.SetCursorPosition(38, top + count);
                     Console.Write("방어력 +{0}", Items[i].Defense);
 
                     Console.Write(" | ");
 
                     Console.WriteLine(Items[i].ItemInfo);
-
-                    
 
                     count++;
                 }
@@ -219,15 +218,6 @@ namespace TextRPG.Managers
         //장비 착용 메서드
         public void WearEquipment(int select)
         {
-            int count = 1;
-            for (int i = 0; i < Items.Length; i++)
-            {
-                if (Items[i].State != ItemState.HaveNot)
-                {
-                    Items[i].InventoryNum = count;
-                    count++;
-                }
-            }
 
             for (int i = 0; i < Items.Length; i++)
             {
@@ -255,8 +245,7 @@ namespace TextRPG.Managers
                 }
             }
 
-            //장비를 착용 중인 상태라면
-            
+
         }
 
 
@@ -267,20 +256,20 @@ namespace TextRPG.Managers
 
             if (Items[i].State == ItemState.HaveNot)
             {
-                bool HasEnoughGold = BuyAndSell.Invoke(Items[i].Gold);
+                bool HasEnoughGold = BuyEvent.Invoke(Items[i].Gold);
 
                 if (HasEnoughGold)
                 {
                     Console.WriteLine($"\n{Items[i].Name}을(를) 성공적으로 구매했습니다!");
                     Items[i].State = ItemState.Have;
                     OwnedItemCount++;
-
-                    Thread.Sleep(1000);
+                    InventoryNumInit();
+                    Thread.Sleep(500);
                 }
                 else
                 {
                     Console.WriteLine("\nGold 가 부족합니다.");
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
 
                 return HasEnoughGold;
@@ -289,41 +278,58 @@ namespace TextRPG.Managers
             else
             {
                 Console.WriteLine("\n이미 구매한 아이템입니다.");
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
                 return false;
             }
         }
 
         //아이템 판매
-        public bool SellItems(int select)
+        public void SellItems(int select)
         {
-            int i = select - 1;
 
-            if (Items[i].State == ItemState.HaveNot)
+            for (int i = 0; i < Items.Length; i++)
             {
-                bool HasEnoughGold = BuyAndSell.Invoke(Items[i].Gold);
+                if (Items[i].State == ItemState.HaveNot) continue;
 
-                if (HasEnoughGold)
+                //입력받은 select와 같은 숫자를 가지고 있는 아이템을 찾아줌
+                if (Items[i].InventoryNum == select)
                 {
-                    Console.WriteLine($"\n{Items[i].Name}을(를) 성공적으로 구매했습니다!");
-                    Items[i].State = ItemState.Have;
-                    OwnedItemCount++;
-                    Thread.Sleep(1000);
-                }
-                else
-                {
-                    Console.WriteLine("\nGold 가 부족합니다.");
-                    Thread.Sleep(1000);
-                }
+                    //만약 착용중인 아이템을 판매한다면
+                    if(Items[i].State == ItemState.Use)
+                        //판매하기 전 착용 해제 이벤트 실행
+                        UnequipEvent?.Invoke(Items[i].Power, Items[i].Defense);
 
-                return HasEnoughGold;
+                    //아이템의 상태를 보유X 상태로 변경
+                    Items[i].State = ItemState.HaveNot;
 
+                    //플레이어 소지 골드 추가
+                    int? price = SellEvent?.Invoke(Items[i].Gold);
+                    OwnedItemCount--;
+
+                    Console.WriteLine($"\n{Items[i].Name}를 판매했습니다.");
+                    Console.WriteLine($"{price} G를 받았습니다!");
+
+                    //인벤토리 넘버 재부여
+                    InventoryNumInit();
+                    break;
+                }
             }
-            else
+
+            Thread.Sleep(500);
+
+        }
+
+        public void InventoryNumInit()
+        {
+            int count = 1;
+            for (int i = 0; i < Items.Length; i++)
             {
-                Console.WriteLine("\n이미 구매한 아이템입니다.");
-                Thread.Sleep(1000);
-                return false;
+                //소유중인 아이템 출력
+                if (Items[i].State != ItemState.HaveNot)
+                {
+                    Items[i].InventoryNum = count;
+                    count++;
+                }
             }
         }
 
