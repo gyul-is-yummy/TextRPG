@@ -263,7 +263,7 @@ namespace TextRPG.Managers
                 GameStart();
             }
  
-            else GameStart();
+            else GameStart(); 
 
         }
 

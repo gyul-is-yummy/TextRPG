@@ -13,8 +13,11 @@ namespace TextRPG.Managers
     {
         public int OwnedItemCount { get; set; }
         public int ItemCount {  get; private set; }
+        public int ItemTypeCount { get; private set; }
 
         private Item[] Items { get; set; }  // 아이템 정보를 저장할 배열
+        public bool[] IsEquip {  get; set; }
+
 
         //Event
         public event Func<int, bool> BuyEvent;           //장비 구매
@@ -28,11 +31,19 @@ namespace TextRPG.Managers
             OwnedItemCount = 0;
             ItemCount = 9;
             Items = new Item[ItemCount];
+            ItemTypeCount = ItemType.GetValues(typeof(ItemType)).Length;
+            IsEquip = new bool[ItemTypeCount];
 
             for (int i = 0; i < Items.Length; i++)
             {
                 Items[i] = new Item();
             }
+
+            for (int i = 0; i < ItemTypeCount; i++)
+            {
+                IsEquip[i] = false;
+            }
+
 
             //방어구
             Items[0].Name = "수련자 갑옷";
@@ -221,31 +232,29 @@ namespace TextRPG.Managers
 
             for (int i = 0; i < Items.Length; i++)
             {
-                if(Items[i].InventoryNum == select)
+                //만약 선택한 Item이 아니라면 돌아가라
+                if (Items[i].InventoryNum != select) continue;
+
+                //만약 동일한 Type에 이미 착용 중인 장비가 있다면
+                if (IsEquip[(int)Items[i].Type])
                 {
+                    //현재 착용 중인 동타입 장비를 해제
+                    FindEquippedItems(Items[i].Type);
 
-                    if (Items[i].State == ItemState.Use)
-                    {
-                        //해제:
-                        UnequipEvent?.Invoke(Items[i].Power, Items[i].Defense);
-                        Items[i].State = ItemState.Have;
-                    }
-                    //장비를 착용하지 않은 상태라면
-                    else if (Items[i].State == ItemState.Have)
-                    {
-                        //장착:
-                        EquipEvent?.Invoke(Items[i].Power, Items[i].Defense);
-                        Items[i].State = ItemState.Use;
-                    }
-                    else
-                    {
-                        Console.WriteLine("오류: 가진적 없는 장비를 장착하려합니다.");
-                    }
-
+                    //선택한 장비 장착
+                    EquipEvent?.Invoke(Items[i].Power, Items[i].Defense);
+                    Items[i].State = ItemState.Use;
+                    IsEquip[(int)Items[i].Type] = true;
+                }
+                //동일한 Type에 이미 착용 중인 장비가 없다면
+                else
+                {
+                    //선택한 장비 장착
+                    EquipEvent?.Invoke(Items[i].Power, Items[i].Defense);
+                    Items[i].State = ItemState.Use;
+                    IsEquip[(int)Items[i].Type] = true;
                 }
             }
-
-
         }
 
 
@@ -333,6 +342,20 @@ namespace TextRPG.Managers
             }
         }
 
+        public void FindEquippedItems(ItemType searchType)
+        {
+            for (int i = 0; i < Items.Length; i++)
+            {
+                //동일한 타입의, 현재 착용중인 장비를 서치
+                if (Items[i].Type == searchType
+                    && Items[i].State == ItemState.Use)
+                {
+                    //착용 해제 시켜준다.
+                    UnequipEvent?.Invoke(Items[i].Power, Items[i].Defense);
+                    Items[i].State = ItemState.Have;
+                }
+            }
+        }
 
 
     }
