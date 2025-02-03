@@ -130,7 +130,7 @@ namespace TextRPG.Managers
             itemManager.ShowInventory(true);
 
             Console.WriteLine("\n0. 나가기");
-            int input = InputCheck(0, itemManager.OwnedItemCount + 1);
+            int input = InputCheck(0, itemManager.OwnedItemCount);
 
             if (input == -1) EquipItem();
             else if (input == 0) Inventory();
@@ -215,7 +215,6 @@ namespace TextRPG.Managers
             //아이템 목록 호출
             //아이템 구매에 들어갈 때만 true를 넣어준다.
             itemManager.ShowInventory(true);
-
 
             Console.WriteLine("\n0. 나가기");
             int input = InputCheck(0, itemManager.OwnedItemCount);

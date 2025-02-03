@@ -12,11 +12,11 @@ namespace TextRPG.Managers
     public class ItemManager
     {
         public int OwnedItemCount { get; set; }
-        public int ItemCount {  get; private set; }
+        public int ItemCount { get; private set; }
         public int ItemTypeCount { get; private set; }
 
         private Item[] Items { get; set; }  // 아이템 정보를 저장할 배열
-        public bool[] IsEquip {  get; set; }
+        public bool[] IsEquip { get; set; }
 
 
         //Event
@@ -28,15 +28,16 @@ namespace TextRPG.Managers
         //ItemManager생성자에서는 주로 아이템의 정보를 넣어줌
         public ItemManager()
         {
-            OwnedItemCount = 0;
-            ItemCount = 9;
-            Items = new Item[ItemCount];
-            ItemTypeCount = ItemType.GetValues(typeof(ItemType)).Length;
-            IsEquip = new bool[ItemTypeCount];
+            OwnedItemCount = 0;                                             //소유 중인 아이템 갯수
+            ItemCount = 9;                                                  //전체 아이템 갯수
+            Items = new Item[ItemCount];                                    //아이템 정보를 저장할 배열
+            ItemTypeCount = ItemType.GetValues(typeof(ItemType)).Length;    //장비 타입 갯수
+            IsEquip = new bool[ItemTypeCount];                              //장비 타입별 착용 중인지 체크하는 변수
 
             for (int i = 0; i < Items.Length; i++)
             {
                 Items[i] = new Item();
+                Items[i].InventoryNum = -1;
             }
 
             for (int i = 0; i < ItemTypeCount; i++)
@@ -122,8 +123,6 @@ namespace TextRPG.Managers
             //아이템 목록 출력
             for (int i = 0; i < Items.Length; i++)
             {
-                top++;
-
                 //만약 아이템 구매로 진입했다면
                 if (IsBuyMode)
                 {
@@ -133,7 +132,7 @@ namespace TextRPG.Managers
                 }
                 //아직 인벤토리라면
                 else
-                { 
+                {
                     //숫자 없음
                     Console.SetCursorPosition(4, top);
                 }
@@ -144,7 +143,7 @@ namespace TextRPG.Managers
                 Console.Write("| 공격력 +{0}", Items[i].Power);
                 Console.SetCursorPosition(35, top);
                 Console.Write(" 방어력 +{0} ", Items[i].Defense);
-                    
+
                 Console.SetCursorPosition(46, top);
                 Console.Write(" | ");
 
@@ -162,10 +161,12 @@ namespace TextRPG.Managers
                     Console.WriteLine("G");
                 }
 
-                if ((i + 1) % 3 == 0) 
+                if ((i + 1) % 3 == 0)
                 {
                     top++;
                 }
+
+                top++;
 
             }
 
@@ -174,6 +175,8 @@ namespace TextRPG.Managers
         //인벤토리를 보여주는 메서드
         public void ShowInventory(bool IsEquipmentMode)
         {
+            InventoryNumInit();
+
             int top = Console.CursorTop;
             int count = 0;  //줄바꿈을 위한 count
 
@@ -181,48 +184,48 @@ namespace TextRPG.Managers
             //이때 장착중인 아이템 앞에는 [E] 표시를 붙여 줍니다.
             for (int i = 0; i < Items.Length; i++)
             {
-                if (Items[i].State != ItemState.HaveNot)
+                if (Items[i].State == ItemState.HaveNot) continue;
+
+                //만약 장비 관리로 진입했다면
+                if (IsEquipmentMode)
                 {
-                    //만약 장비 관리로 진입했다면
-                    if (IsEquipmentMode)
-                    {
-                        //숫자 표시
-                        Console.SetCursorPosition(1, top + count);
-                        Console.Write($"{count + 1} ");
-                    }
-                    //아직 인벤토리라면
-                    else
-                    {
-                        //숫자 없음
-                        Console.SetCursorPosition(3, top + count);
-                    }
-
-                    //착용중인 장비인지 확인
-                    if (Items[i].State == ItemState.Use)
-                    {
-                        Console.Write($"[E] ");
-                    }
-                    else
-                    {
-                        Console.Write($" -  ");
-                    }
-
-                    Console.Write(Items[i].Name);
-                    
-                    Console.SetCursorPosition(24, top + count);
-                    Console.Write(" | ");
-                    
-                    Console.Write("공격력 +{0}", Items[i].Power);
-
-                    Console.SetCursorPosition(38, top + count);
-                    Console.Write("방어력 +{0}", Items[i].Defense);
-
-                    Console.Write(" | ");
-
-                    Console.WriteLine(Items[i].ItemInfo);
-
-                    count++;
+                    //숫자 표시
+                    Console.SetCursorPosition(1, top + count);
+                    Console.Write($"{count + 1} ");
                 }
+                //아직 인벤토리라면
+                else
+                {
+                    //숫자 없음
+                    Console.SetCursorPosition(3, top + count);
+                }
+
+                //착용중인 장비인지 확인
+                if (Items[i].State == ItemState.Use)
+                {
+                    Console.Write($"[E] ");
+                }
+                else
+                {
+                    Console.Write($" -  ");
+                }
+
+                Console.Write(Items[i].Name);
+
+                Console.SetCursorPosition(24, top + count);
+                Console.Write(" | ");
+
+                Console.Write("공격력 +{0}", Items[i].Power);
+
+                Console.SetCursorPosition(38, top + count);
+                Console.Write("방어력 +{0}", Items[i].Defense);
+
+                Console.Write(" | ");
+
+                Console.WriteLine(Items[i].ItemInfo);
+
+                count++;
+
             }
         }
 
@@ -233,7 +236,8 @@ namespace TextRPG.Managers
             for (int i = 0; i < Items.Length; i++)
             {
                 //만약 선택한 Item이 아니라면 돌아가라
-                if (Items[i].InventoryNum != select) continue;
+                if (Items[i].InventoryNum != select)
+                    continue;
 
                 //만약 동일한 Type에 이미 착용 중인 장비가 있다면
                 if (IsEquip[(int)Items[i].Type])
@@ -245,6 +249,7 @@ namespace TextRPG.Managers
                     EquipEvent?.Invoke(Items[i].Power, Items[i].Defense);
                     Items[i].State = ItemState.Use;
                     IsEquip[(int)Items[i].Type] = true;
+                    break;
                 }
                 //동일한 Type에 이미 착용 중인 장비가 없다면
                 else
@@ -253,13 +258,14 @@ namespace TextRPG.Managers
                     EquipEvent?.Invoke(Items[i].Power, Items[i].Defense);
                     Items[i].State = ItemState.Use;
                     IsEquip[(int)Items[i].Type] = true;
+                    break;
                 }
             }
         }
 
 
         //아이템 구매
-        public bool BuyItems(int select)
+        public void BuyItems(int select)
         {
             int i = select - 1;
 
@@ -272,6 +278,8 @@ namespace TextRPG.Managers
                     Console.WriteLine($"\n{Items[i].Name}을(를) 성공적으로 구매했습니다!");
                     Items[i].State = ItemState.Have;
                     OwnedItemCount++;
+
+                    //인벤토리 넘버 재부여
                     InventoryNumInit();
                     Thread.Sleep(500);
                 }
@@ -281,14 +289,14 @@ namespace TextRPG.Managers
                     Thread.Sleep(500);
                 }
 
-                return HasEnoughGold;
+                //return HasEnoughGold;
 
             }
             else
             {
                 Console.WriteLine("\n이미 구매한 아이템입니다.");
                 Thread.Sleep(500);
-                return false;
+                //return false;
             }
         }
 
@@ -298,13 +306,14 @@ namespace TextRPG.Managers
 
             for (int i = 0; i < Items.Length; i++)
             {
+                //가지고 있지 않은 아이템이라면 돌려보내준다.
                 if (Items[i].State == ItemState.HaveNot) continue;
 
                 //입력받은 select와 같은 숫자를 가지고 있는 아이템을 찾아줌
                 if (Items[i].InventoryNum == select)
                 {
                     //만약 착용중인 아이템을 판매한다면
-                    if(Items[i].State == ItemState.Use)
+                    if (Items[i].State == ItemState.Use)
                         //판매하기 전 착용 해제 이벤트 실행
                         UnequipEvent?.Invoke(Items[i].Power, Items[i].Defense);
 
@@ -313,6 +322,8 @@ namespace TextRPG.Managers
 
                     //플레이어 소지 골드 추가
                     int? price = SellEvent?.Invoke(Items[i].Gold);
+
+                    //소지 아이템 갯수 -1
                     OwnedItemCount--;
 
                     Console.WriteLine($"\n{Items[i].Name}를 판매했습니다.");
@@ -320,6 +331,7 @@ namespace TextRPG.Managers
 
                     //인벤토리 넘버 재부여
                     InventoryNumInit();
+
                     break;
                 }
             }
@@ -330,10 +342,14 @@ namespace TextRPG.Managers
 
         public void InventoryNumInit()
         {
+            for (int i = 0; i < Items.Length; i++)
+            {
+                Items[i].InventoryNum = 0;
+            }
+
             int count = 1;
             for (int i = 0; i < Items.Length; i++)
             {
-                //소유중인 아이템 출력
                 if (Items[i].State != ItemState.HaveNot)
                 {
                     Items[i].InventoryNum = count;
