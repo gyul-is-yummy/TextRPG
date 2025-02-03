@@ -27,6 +27,7 @@ namespace TextRPG.Models
         public int Gold { get; set; } = 100;
         public float Power { get; set; } = 0f;
         public float Defense { get; set; } = 0f;
+        public int InventoryNum { get; set; } = 0;
         public ItemType Type { get; set; }
         public ItemState State { get; set; } = ItemState.HaveNot;
     }

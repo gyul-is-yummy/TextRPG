@@ -103,8 +103,7 @@ namespace TextRPG.Managers
             Console.WriteLine("[아이템 목록]\n");
 
             //인벤토리 호출
-            //장비 관리에 들어갈 때만 true를 넣어준다.
-            itemManager.ShowInventory(4, false);
+            itemManager.ShowInventory( false);
 
             Console.WriteLine("\n1. 장착 관리");
             Console.WriteLine("0. 나가기");
@@ -127,7 +126,7 @@ namespace TextRPG.Managers
 
             //인벤토리 호출
             //장비 관리에 들어갈 때만 true를 넣어준다.
-            itemManager.ShowInventory(4, true);
+            itemManager.ShowInventory(true);
 
             Console.WriteLine("\n0. 나가기");
             int input = InputCheck(0, itemManager.OwnedItemCount + 1);
@@ -155,19 +154,22 @@ namespace TextRPG.Managers
 
             //아이템 목록 호출
             //아이템 구매에 들어갈 때만 true를 넣어준다.
-            itemManager.ShowItemList(7, false);
+            itemManager.ShowItemList(false);
 
             Console.WriteLine("\n1. 아이템 구매");
-            //Console.WriteLine("2. 아이템 판매");
+            Console.WriteLine("2. 아이템 판매");
             Console.WriteLine("0. 나가기");
             int input = InputCheck(0, 2);
 
             if (input == -1) ItemShop();
             else if (input == 1) ItemShop_Buy();
+            else if (input == 2) ItemShop_Sell();
             else GameStart();
 
         }
 
+
+        //아이템 구매
         public void ItemShop_Buy()
         {
             Console.Clear();
@@ -181,7 +183,7 @@ namespace TextRPG.Managers
 
             //아이템 목록 호출
             //아이템 구매에 들어갈 때만 true를 넣어준다.
-            itemManager.ShowItemList(7, true);
+            itemManager.ShowItemList(true);
 
             Console.WriteLine("\n0. 나가기");
             int input = InputCheck(0, itemManager.ItemCount);
@@ -195,6 +197,38 @@ namespace TextRPG.Managers
             }
 
         }
+
+
+        //아이템 판매
+        public void ItemShop_Sell()
+        {
+            Console.Clear();
+            Console.WriteLine("상점 - 아이템 판매");
+            Console.WriteLine("필요 없는 아이템을 85% 가격으로 팔 수 있습니다.\n");
+
+            Console.WriteLine("[보유 골드]");
+            Console.WriteLine(player.Gold + "G\n");
+
+            Console.WriteLine("[아이템 목록]");
+
+            //아이템 목록 호출
+            //아이템 구매에 들어갈 때만 true를 넣어준다.
+            itemManager.ShowInventory(true);
+
+
+            Console.WriteLine("\n0. 나가기");
+            int input = InputCheck(0, itemManager.ItemCount);
+
+            if (input == -1) ItemShop_Buy();
+            else if (input == 0) ItemShop();
+            else
+            {
+                itemManager.SellItems(input);
+                ItemShop_Buy();
+            }
+
+        }
+
 
         public void Rest()
         {

@@ -102,6 +102,5 @@ namespace TextRPG.Models
         {
             return Gold >= price;
         }
-
     }
 }
