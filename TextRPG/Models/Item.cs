@@ -25,7 +25,6 @@ namespace TextRPG.Models
         public string Name { get; set; } = string.Empty;
         public string ItemInfo { get; set; } = string.Empty;
         public int Gold { get; set; } = 100;
-
         public float Power { get; set; } = 0f;
         public float Defense { get; set; } = 0f;
         public ItemType Type { get; set; }

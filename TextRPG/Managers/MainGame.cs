@@ -53,17 +53,18 @@ namespace TextRPG.Managers
             Console.WriteLine("1. 상태 보기");
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
-            //Console.WriteLine("4. 던전 입장");
+            Console.WriteLine("4. 휴식 기능");
 
             Console.WriteLine("\n0. 게임종료");
 
             //키를 입력받음
-            int input = InputCheck(0, 3);
+            int input = InputCheck(0, 4);
 
             if (input == -1) GameStart();
             else if (input == 1) StatusCheck();
             else if (input == 2) Inventory();
             else if (input == 3) ItemShop();
+            else if (input == 4) Rest();
             else Environment.Exit(0);
 
         }
@@ -77,10 +78,10 @@ namespace TextRPG.Managers
             Console.WriteLine("캐릭터의 정보가 표시됩니다.\n");
 
             Console.WriteLine($"Lv. {player.Level}");
-            Console.WriteLine($"{player.name} ( {player.Job} )");
-            Console.WriteLine($"공격력 : {player.power} (+{player.ItemPow})");
-            Console.WriteLine($"방어력 : {player.defense} (+{player.ItemDef})");
-            Console.WriteLine($"체 력 : {player.hp}");
+            Console.WriteLine($"{player.Name} ( {player.Job} )");
+            Console.WriteLine($"공격력 : {player.Power} (+{player.ItemPow})");
+            Console.WriteLine($"방어력 : {player.Defense} (+{player.ItemDef})");
+            Console.WriteLine($"체 력 : {player.Hp}/{player.MaxHP}");
             Console.WriteLine($"Gold : {player.Gold} G");
 
             Console.WriteLine("\n0. 나가기");
@@ -169,7 +170,6 @@ namespace TextRPG.Managers
 
         public void ItemShop_Buy()
         {
-
             Console.Clear();
             Console.WriteLine("상점 - 아이템 구매");
             Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.\n");
@@ -195,6 +195,43 @@ namespace TextRPG.Managers
             }
 
         }
+
+        public void Rest()
+        {
+            Console.Clear();
+            Console.WriteLine("휴식하기");
+            Console.WriteLine($"500 G 를 내면 체력을 회복할 수 있습니다. (보유 골드 : {player.Gold} G)\n");
+
+            Console.WriteLine("1. 휴식하기");
+            Console.WriteLine("0. 나가기");
+
+            int input = InputCheck(0, 1);
+
+            if (input == -1) Rest();
+            else if (input == 1)
+            {
+                //만약 충분한 골드를 가지고 있다면
+                if(player.HasEnoughGold(500))
+                {
+                    Console.WriteLine("\n휴식을 완료했습니다.");
+                    player.Hp += 100; //체력회복
+                    Thread.Sleep(500);
+                }
+                //충분하지 않다면
+                else
+                {
+                    Console.WriteLine("\nGold가 부족합니다.");
+                    Thread.Sleep(500);
+                }
+
+                GameStart();
+            }
+ 
+            else GameStart();
+
+        }
+
+
 
     }
 }

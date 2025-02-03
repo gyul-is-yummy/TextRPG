@@ -9,6 +9,21 @@ namespace TextRPG.Models
 {
     public class Player : Character
     {
+        public string Name { get; set; } = string.Empty;
+        public float Power { get; set; }
+        public float Defense { get; set; }
+        public float MaxHP { get; private set; }
+
+        private float hp;
+        public float Hp
+        {
+            get { return hp; }
+            set
+            {
+                if (value + hp > MaxHP)
+                    hp = MaxHP;
+            }
+        }
         public int Level { get; set; }
         public string Job { get; set; }
 
@@ -35,11 +50,11 @@ namespace TextRPG.Models
 
         public Player()
         {
-            name = "플레이어";
-            power = 1f;
-            defense = 1f;
-            hp = 1f;
-            speed = 1f;
+            Name = "플레이어";
+            Power = 1f;
+            Defense = 1f;
+            MaxHP = 100f;
+            hp = 10f;
             Level = 1;
             Job = "직업";
             gold = 100000;
@@ -48,6 +63,7 @@ namespace TextRPG.Models
             ItemDef = 0f;
         }
 
+        //장비 구매 메서드
         public bool BuyItem(int price)
         {
             if (price > gold)
@@ -61,15 +77,14 @@ namespace TextRPG.Models
             }
 
         }
-
         //장비 착용 메서드
         public void UseItem(float pow, float def)
         {
             ItemPow += pow;
             ItemDef += def;
 
-            power += pow;
-            defense += def;
+            Power += pow;
+            Defense += def;
         }
         //장비 해제 메서드
         public void DisuseItem(float pow, float def)
@@ -77,8 +92,16 @@ namespace TextRPG.Models
             ItemPow -= pow;
             ItemDef -= def;
 
-            power -= pow;
-            defense -= def;
+            Power -= pow;
+            Defense -= def;
         }
+
+
+        //플레이어의 소지 골드가 충분한지 확인하는 메서드
+        public bool HasEnoughGold(float price)
+        {
+            return Gold >= price;
+        }
+
     }
 }

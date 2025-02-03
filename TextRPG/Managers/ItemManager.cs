@@ -10,16 +10,13 @@ namespace TextRPG.Managers
 {
     public class ItemManager
     {
-        
         public int OwnedItemCount { get; set; }
         public int ItemCount {  get; private set; }
-
-
 
         private Item[] Items { get; set; }  // 아이템 정보를 저장할 배열
 
         //Event
-        public event Func<int, bool> BuyAndSell;            //장비 구매
+        public event Func<int, bool> BuyAndSell;         //장비 구매
         public event Action<float, float> EquipEvent;    //장비 착용
         public event Action<float, float> UnequipEvent;  //장비 해제
 
@@ -160,7 +157,6 @@ namespace TextRPG.Managers
             }
 
         }
-
 
         //인벤토리를 보여주는 메서드
         public void ShowInventory(int top, bool IsEquipmentMode)
