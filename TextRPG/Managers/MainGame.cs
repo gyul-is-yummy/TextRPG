@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using TextRPG.Models;
@@ -12,17 +12,31 @@ namespace TextRPG.Managers
     {
         private Player player;
         private ItemManager itemManager;
+        private Dunjeon dunjeon;
+
+        //Event
+        public event Action<float, float, int, int> DungeonClearEvent;
+        public event Action<float> DungeonFailEvent;
 
         public MainGame()
         {
             player = new Player();
             itemManager = new ItemManager(player.Job);
+            dunjeon = new Dunjeon();
 
             // Event 연결
             itemManager.BuyEvent += player.BuyItem;
             itemManager.SellEvent += player.SellItem;
             itemManager.EquipEvent += player.UseItem;
             itemManager.UnequipEvent += player.DisuseItem;
+
+            //DungeonClearEvent += player.Victory;
+            //DungeonClearEvent += dunjeon.DungeonClear;
+
+            //DungeonFailEvent += player.Defeat;
+            //DungeonFailEvent += dunjeon.DungeonFail;
+
+
         }
 
         //키 입력을 받고 올바른 입력인지 체크하는 메서드
@@ -128,18 +142,20 @@ namespace TextRPG.Managers
             Console.WriteLine("1. 상태 보기");
             Console.WriteLine("2. 인벤토리");
             Console.WriteLine("3. 상점");
-            Console.WriteLine("4. 휴식 기능");
+            Console.WriteLine("4. 던전입장");
+            Console.WriteLine("5. 휴식하기");
 
             Console.WriteLine("\n0. 게임종료");
 
             //키를 입력받음
-            int input = InputCheck(0, 4);
+            int input = InputCheck(0, 5);
 
             if (input == -1) GameStart();
             else if (input == 1) StatusCheck();
             else if (input == 2) Inventory();
             else if (input == 3) ItemShop();
-            else if (input == 4) Rest();
+            else if (input == 4) EnterDungeon();
+            else if (input == 5) Rest();
             else Environment.Exit(0);
 
         }
@@ -175,7 +191,7 @@ namespace TextRPG.Managers
             Console.WriteLine("인벤토리");
             Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.\n");
 
-            Console.WriteLine("[아이템 목록]\n");
+            Console.WriteLine("[아이템 목록]");
 
             //인벤토리 호출
             itemManager.ShowInventory( false);
@@ -338,7 +354,56 @@ namespace TextRPG.Managers
 
         }
 
+        //던전입장 Scene
+        public void EnterDungeon()
+        {
+            Console.Clear();
+            Console.WriteLine("던전입장");
+            Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.\n");
+            Console.WriteLine("1. 쉬운 던전\t| 방어력 5 이상 권장");
+            Console.WriteLine("2. 일반 던전\t| 방어력 11 이상 권장");
+            Console.WriteLine("3. 어려운 던전\t| 방어력 17 이상 권장");
 
+            Console.WriteLine("\n0. 나가기");
+            int input = InputCheck(0, 3);
+
+            if (input == -1) EnterDungeon();
+            else if (input == 0) GameStart();
+            else
+            {
+                //입력한 난이도 설정
+                dunjeon.Level = (DunjeonType)input;
+
+                //플레이어의 기존 소지금/체력 저장
+                float tempHp = player.Hp;
+                int tempGold = player.Gold;
+
+                //던전 클리어 여부 체크
+                bool isClear = dunjeon.ClearCheck(player.Defense);
+
+                if (isClear)
+                {
+                    player.Victory(dunjeon.Def, dunjeon.Gold);
+                    dunjeon.DungeonClear(tempHp, player.Hp, tempGold, player.Gold); 
+                }
+                else
+                {
+                    player.Defeat();
+                    dunjeon.DungeonFail(tempHp, player.Hp);
+                }
+
+                Thread.Sleep(2000);
+                EnterDungeon();
+
+            }
+        }
+
+        //던전 내부 Scene
+        public void DungeonBattle()
+        {
+
+
+        }
 
     }
 }

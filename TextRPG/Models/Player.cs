@@ -15,7 +15,7 @@ public enum JobType
 
 namespace TextRPG.Models
 {
-    public class Player : Character
+    public class Player
     {
         public string[] tempName;
         public string Name { get; set; } = string.Empty;
@@ -29,11 +29,21 @@ namespace TextRPG.Models
             get { return hp; }
             set
             {
-                if (value + hp > MaxHP)
+                hp = value;
+
+                if (hp > MaxHP)
+                {
                     hp = MaxHP;
+                }
+                else if(hp < 0)
+                {
+                    hp = 0;
+                }
             }
         }
         public int Level { get; set; }
+
+        public float Exp { get; set; }
 
         private int gold;
         public int Gold
@@ -41,15 +51,12 @@ namespace TextRPG.Models
             get { return gold; }
             set
             {
-                if (value < 0)
-                {
+                gold = value;
 
-                }
-                else
+                if (gold < 0)
                 {
-                    gold = value;
+                    gold = 0;
                 }
-
             }
         }
 
@@ -81,7 +88,7 @@ namespace TextRPG.Models
                 if (job == JobType.Warrior)
                 {
                     jobName = "전사";
-                } 
+                }
                 else if (job == JobType.Magician)
                 {
                     jobName = "마법사";
@@ -99,11 +106,12 @@ namespace TextRPG.Models
             Name = "플레이어";
             Power = 1f;
             Defense = 1f;
-            MaxHP = 100f;
-            hp = 10f;
+            MaxHP = 10f;
+            Hp = MaxHP;
             Level = 1;
+            Exp = 0f;
             JobName = "직업";
-            gold = 100000;
+            Gold = 100000;
 
             ItemPow = 0f;
             ItemDef = 0f;
@@ -208,5 +216,52 @@ namespace TextRPG.Models
         {
             return Gold >= price;
         }
+        
+        //레벨업 메서드
+        public void LevelUp()
+        {
+            Level++;
+            Exp = 0f;
+            MaxHP += 10f;
+            Hp = MaxHP;
+            Power += 0.5f;
+            Defense += 1f;
+        }
+
+
+        //던전 클리어시 호출되는 메서드
+        public void Victory(float dunjeonDef, int dunjeonGold)
+        {
+
+            //<체력 감소>
+            Random rand = new Random();
+            int temp = (int)(Defense - dunjeonDef);
+
+            // 체력에서 20~35 사이의 값을 감소시킴
+            int damage = rand.Next(20 - temp, 36 - temp);
+
+            //만약 플레이어의 너무 방어력이 높아서
+            //체력을 회복시켜주게 될 경우
+            //데미지를 0으로 만든다.
+            if (damage < 0) damage = 0;
+            Hp -= damage;
+
+
+            //<골드 증가>
+            //공격력 추가보상: 공격력~공격력*2 % 값만큼 보너스 골드
+            temp = rand.Next((int)(Power), (int)(Power * 2));
+            float bonus = dunjeonGold * (temp * 0.01f);
+
+            Gold += (int)(dunjeonGold + bonus);
+
+        }
+
+        //던전 공략 실패시 호출되는 메서드
+        public void Defeat()
+        {
+            Hp -= (Hp / 2);
+        }
+
+
     }
 }

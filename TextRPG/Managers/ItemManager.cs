@@ -254,6 +254,9 @@ namespace TextRPG.Managers
                     //아이템의 상태를 보유X 상태로 변경
                     Items[i].State = ItemState.HaveNot;
 
+                    //판매한 아이템의 인벤토리 넘버를 -1로 초기화
+                    Items[i].InventoryNum = -1;
+
                     //플레이어 소지 골드 추가
                     int? price = SellEvent?.Invoke(Items[i].Gold);
 
@@ -276,11 +279,6 @@ namespace TextRPG.Managers
 
         public void InventoryNumInit()
         {
-            for (int i = 0; i < Items.Length; i++)
-            {
-                Items[i].InventoryNum = 0;
-            }
-
             int count = 1;
             for (int i = 0; i < Items.Length; i++)
             {
