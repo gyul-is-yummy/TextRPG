@@ -43,7 +43,27 @@ namespace TextRPG.Models
         }
         public int Level { get; set; }
 
-        public float Exp { get; set; }
+        private int exp;
+        public int Exp
+        {
+            get { return exp; }
+            set
+            {
+                exp = value;
+                if (exp >= MaxExp)
+                {
+                    LevelUp();
+                    MaxExp++;
+                }
+            }
+        }
+
+        private int maxExp;
+        public int MaxExp
+        {
+            get { return maxExp; }
+            private set { maxExp = value; }
+        }
 
         private int gold;
         public int Gold
@@ -109,7 +129,8 @@ namespace TextRPG.Models
             MaxHP = 10f;
             Hp = MaxHP;
             Level = 1;
-            Exp = 0f;
+            MaxExp = 1;
+            Exp = 0;
             JobName = "직업";
             Gold = 100000;
 
@@ -221,11 +242,19 @@ namespace TextRPG.Models
         public void LevelUp()
         {
             Level++;
-            Exp = 0f;
+            Exp = 0;
             MaxHP += 10f;
             Hp = MaxHP;
             Power += 0.5f;
             Defense += 1f;
+
+            Console.WriteLine("\n레벨업! 현재 레벨: " + Level);
+            Thread.Sleep(500);
+            Console.WriteLine("공격력: " + Power + " 방어력: " + Defense + " 체력: " + MaxHP);
+            Thread.Sleep(500);
+            Console.WriteLine("다음 레벨업까지 필요한 경험치: " + (MaxExp - Exp));
+            Thread.Sleep(1000);
+
         }
 
 

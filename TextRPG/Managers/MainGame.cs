@@ -384,7 +384,11 @@ namespace TextRPG.Managers
                 if (isClear)
                 {
                     player.Victory(dunjeon.Def, dunjeon.Gold);
-                    dunjeon.DungeonClear(tempHp, player.Hp, tempGold, player.Gold); 
+                    dunjeon.DungeonClear(tempHp, player.Hp, tempGold, player.Gold);
+
+                    //경험치 증가
+                    player.Exp++;
+
                 }
                 else
                 {
