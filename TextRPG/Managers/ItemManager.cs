@@ -26,7 +26,7 @@ namespace TextRPG.Managers
         public event Action<float, float> UnequipEvent;  //장비 해제
 
         //ItemManager생성자에서는 주로 아이템의 정보를 넣어줌
-        public ItemManager()
+        public ItemManager(JobType playerJob)
         {
             OwnedItemCount = 0;                                             //소유 중인 아이템 갯수
             ItemCount = 9;                                                  //전체 아이템 갯수
@@ -44,73 +44,6 @@ namespace TextRPG.Managers
             {
                 IsEquip[i] = false;
             }
-
-
-            //방어구
-            Items[0].Name = "수련자 갑옷";
-            Items[0].Power = 0f;
-            Items[0].Defense = 5f;
-            Items[0].ItemInfo = "수련에 도움을 주는 갑옷입니다.";
-            Items[0].Gold = 1000;
-            Items[0].Type = ItemType.Armor;
-
-            Items[1].Name = "무쇠갑옷";
-            Items[1].Power = 0f;
-            Items[1].Defense = 9f;
-            Items[1].ItemInfo = "무쇠로 만들어져 튼튼한 갑옷입니다. ";
-            Items[1].Gold = 1800;
-            Items[1].Type = ItemType.Armor;
-
-            Items[2].Name = "스파르타의 갑옷";
-            Items[2].Power = 0f;
-            Items[2].Defense = 15f;
-            Items[2].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.";
-            Items[2].Gold = 3500;
-            Items[2].Type = ItemType.Armor;
-
-            //무기
-            Items[3].Name = "낡은 검";
-            Items[3].Power = 2f;
-            Items[3].Defense = 0f;
-            Items[3].ItemInfo = "쉽게 볼 수 있는 낡은 검 입니다.";
-            Items[3].Gold = 600;
-            Items[3].Type = ItemType.Weapon;
-
-            Items[4].Name = "청동 도끼";
-            Items[4].Power = 5f;
-            Items[4].Defense = 0f;
-            Items[4].ItemInfo = "어디선가 사용됐던거 같은 도끼입니다.";
-            Items[4].Gold = 1500;
-            Items[4].Type = ItemType.Weapon;
-
-            Items[5].Name = "스파르타의 창";
-            Items[5].Power = 7f;
-            Items[5].Defense = 0f;
-            Items[5].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 창입니다.";
-            Items[5].Gold = 2700;
-            Items[5].Type = ItemType.Weapon;
-
-            //악세서리
-            Items[6].Name = "나무 목걸이";
-            Items[6].Power = 3f;
-            Items[6].Defense = 3f;
-            Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
-            Items[6].Gold = 2700;
-            Items[6].Type = ItemType.Accessories;
-
-            Items[7].Name = "누군가의 은반지";
-            Items[7].Power = 6f;
-            Items[7].Defense = 6f;
-            Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
-            Items[7].Gold = 2700;
-            Items[7].Type = ItemType.Accessories;
-
-            Items[8].Name = "스파르타의 허리띠";
-            Items[8].Power = 9f;
-            Items[8].Defense = 9f;
-            Items[8].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 허리띠입니다.";
-            Items[8].Gold = 2700;
-            Items[8].Type = ItemType.Accessories;
 
         }
 
@@ -161,6 +94,7 @@ namespace TextRPG.Managers
                     Console.WriteLine("G");
                 }
 
+                //3줄 마다 한 줄씩 더 띄워줌
                 if ((i + 1) % 3 == 0)
                 {
                     top++;
@@ -373,6 +307,230 @@ namespace TextRPG.Managers
             }
         }
 
+
+        public void SetItems(JobType playerJob)
+        {
+            if (playerJob == JobType.Warrior)
+            {
+                SetItemsForWarrior();
+            }
+            else if (playerJob == JobType.Magician)
+            {
+                SetItemsForMagician();
+            }
+            else if (playerJob == JobType.Archer)
+            {
+                SetItemsForArcher();
+            }
+        }
+
+        private void SetItemsForWarrior()
+        {
+            //전사 방어구
+            Items[0].Name = "수련용 사슬 갑옷";
+            Items[0].Power = 0f;
+            Items[0].Defense = 5f;
+            Items[0].ItemInfo = "수련에 도움을 주는 사슬 갑옷입니다.";
+            Items[0].Gold = 1000;
+            Items[0].Type = ItemType.Armor;
+
+            Items[1].Name = "무쇠갑옷";
+            Items[1].Power = 0f;
+            Items[1].Defense = 9f;
+            Items[1].ItemInfo = "무쇠로 만들어져 튼튼한 갑옷입니다. ";
+            Items[1].Gold = 1800;
+            Items[1].Type = ItemType.Armor;
+
+            Items[2].Name = "스파르타의 갑옷";
+            Items[2].Power = 0f;
+            Items[2].Defense = 15f;
+            Items[2].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.";
+            Items[2].Gold = 3500;
+            Items[2].Type = ItemType.Armor;
+
+            //전사 무기
+            Items[3].Name = "낡은 검";
+            Items[3].Power = 2f;
+            Items[3].Defense = 0f;
+            Items[3].ItemInfo = "쉽게 볼 수 있는 낡은 검 입니다.";
+            Items[3].Gold = 600;
+            Items[3].Type = ItemType.Weapon;
+
+            Items[4].Name = "청동 도끼";
+            Items[4].Power = 5f;
+            Items[4].Defense = 0f;
+            Items[4].ItemInfo = "어디선가 사용됐던거 같은 도끼입니다.";
+            Items[4].Gold = 1500;
+            Items[4].Type = ItemType.Weapon;
+
+            Items[5].Name = "스파르타의 창";
+            Items[5].Power = 7f;
+            Items[5].Defense = 0f;
+            Items[5].ItemInfo = "스파르타의 전사들이 사용했다는 전설의 창입니다.";
+            Items[5].Gold = 2700;
+            Items[5].Type = ItemType.Weapon;
+
+            //악세서리
+            Items[6].Name = "나무 목걸이";
+            Items[6].Power = 3f;
+            Items[6].Defense = 3f;
+            Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
+            Items[6].Gold = 2700;
+            Items[6].Type = ItemType.Accessories;
+
+            Items[7].Name = "누군가의 은반지";
+            Items[7].Power = 6f;
+            Items[7].Defense = 6f;
+            Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
+            Items[7].Gold = 2700;
+            Items[7].Type = ItemType.Accessories;
+
+            Items[8].Name = "스파르타의 허리띠";
+            Items[8].Power = 9f;
+            Items[8].Defense = 9f;
+            Items[8].ItemInfo = "스파르타의 용사들이 사용했다는 전설의 허리띠입니다.";
+            Items[8].Gold = 2700;
+            Items[8].Type = ItemType.Accessories;
+        }
+
+
+        private void SetItemsForMagician()
+        {
+            //마법사 방어구
+            Items[0].Name = "수련용 로브";
+            Items[0].Power = 0f;
+            Items[0].Defense = 5f;
+            Items[0].ItemInfo = "수련에 도움을 주는 로브입니다.";
+            Items[0].Gold = 1000;
+            Items[0].Type = ItemType.Armor;
+
+            Items[1].Name = "마법사 로브";
+            Items[1].Power = 0f;
+            Items[1].Defense = 9f;
+            Items[1].ItemInfo = "던전산 실로 한땀한땀 만든 마법사 로브입니다.";
+            Items[1].Gold = 1800;
+            Items[1].Type = ItemType.Armor;
+
+            Items[2].Name = "스파르타의 로브";
+            Items[2].Power = 0f;
+            Items[2].Defense = 15f;
+            Items[2].ItemInfo = "스파르타의 마법사들이 사용했다는 전설의 로브입니다.";
+            Items[2].Gold = 3500;
+            Items[2].Type = ItemType.Armor;
+
+            //마법사 무기
+            Items[3].Name = "낡은 지팡이";
+            Items[3].Power = 2f;
+            Items[3].Defense = 0f;
+            Items[3].ItemInfo = "쉽게 볼 수 있는 낡은 지팡이 입니다.";
+            Items[3].Gold = 600;
+            Items[3].Type = ItemType.Weapon;
+
+            Items[4].Name = "멋들어진 케인";
+            Items[4].Power = 5f;
+            Items[4].Defense = 0f;
+            Items[4].ItemInfo = "성능과 디자인을 모두 잡은, 멋쟁이 마법사들의 필수 지팡이입니다.";
+            Items[4].Gold = 1500;
+            Items[4].Type = ItemType.Weapon;
+
+            Items[5].Name = "스파르타의 스태프";
+            Items[5].Power = 7f;
+            Items[5].Defense = 0f;
+            Items[5].ItemInfo = "스파르타 소속 수석 마법사들이 사용했다는 전설의 스태프입니다.";
+            Items[5].Gold = 2700;
+            Items[5].Type = ItemType.Weapon;
+
+            //악세서리
+            Items[6].Name = "나무 목걸이";
+            Items[6].Power = 3f;
+            Items[6].Defense = 3f;
+            Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
+            Items[6].Gold = 2700;
+            Items[6].Type = ItemType.Accessories;
+
+            Items[7].Name = "누군가의 은반지";
+            Items[7].Power = 6f;
+            Items[7].Defense = 6f;
+            Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
+            Items[7].Gold = 2700;
+            Items[7].Type = ItemType.Accessories;
+
+            Items[8].Name = "스파르타의 허리띠";
+            Items[8].Power = 9f;
+            Items[8].Defense = 9f;
+            Items[8].ItemInfo = "스파르타의 용사들이 사용했다는 전설의 허리띠입니다.";
+            Items[8].Gold = 2700;
+            Items[8].Type = ItemType.Accessories;
+        }
+
+        private void SetItemsForArcher()
+        {
+            //궁수 방어구
+            Items[0].Name = "수련용 천옷";
+            Items[0].Power = 0f;
+            Items[0].Defense = 5f;
+            Items[0].ItemInfo = "가볍지만 질기고, 빨래가 쉬운 수련용 천옷입니다.";
+            Items[0].Gold = 1000;
+            Items[0].Type = ItemType.Armor;
+
+            Items[1].Name = "가죽 보호대";
+            Items[1].Power = 0f;
+            Items[1].Defense = 9f;
+            Items[1].ItemInfo = "몬스터의 가죽으로 만든 가볍고 튼튼한 가죽 보호대입니다.";
+            Items[1].Gold = 1800;
+            Items[1].Type = ItemType.Armor;
+
+            Items[2].Name = "스파르타의 장갑";
+            Items[2].Power = 0f;
+            Items[2].Defense = 15f;
+            Items[2].ItemInfo = "스파르타의 궁수들이 사용했다는 전설의 장갑입니다.";
+            Items[2].Gold = 3500;
+            Items[2].Type = ItemType.Armor;
+
+            //궁수 무기
+            Items[3].Name = "낡은 활";
+            Items[3].Power = 2f;
+            Items[3].Defense = 0f;
+            Items[3].ItemInfo = "쉽게 볼 수 있는 낡은 활 입니다.";
+            Items[3].Gold = 600;
+            Items[3].Type = ItemType.Weapon;
+
+            Items[4].Name = "튼튼한 철제 석궁";
+            Items[4].Power = 5f;
+            Items[4].Defense = 0f;
+            Items[4].ItemInfo = "사용감이 있지만 매우 튼튼한 철제 석궁입니다.";
+            Items[4].Gold = 1500;
+            Items[4].Type = ItemType.Weapon;
+
+            Items[5].Name = "스파르타의 대궁";
+            Items[5].Power = 7f;
+            Items[5].Defense = 0f;
+            Items[5].ItemInfo = "스파르타의 궁수들이 사용했다는 전설의 대궁입니다.";
+            Items[5].Gold = 2700;
+            Items[5].Type = ItemType.Weapon;
+
+            //악세서리
+            Items[6].Name = "나무 목걸이";
+            Items[6].Power = 3f;
+            Items[6].Defense = 3f;
+            Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
+            Items[6].Gold = 2700;
+            Items[6].Type = ItemType.Accessories;
+
+            Items[7].Name = "누군가의 은반지";
+            Items[7].Power = 6f;
+            Items[7].Defense = 6f;
+            Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
+            Items[7].Gold = 2700;
+            Items[7].Type = ItemType.Accessories;
+
+            Items[8].Name = "스파르타의 허리띠";
+            Items[8].Power = 9f;
+            Items[8].Defense = 9f;
+            Items[8].ItemInfo = "스파르타의 용사들이 사용했다는 전설의 허리띠입니다.";
+            Items[8].Gold = 2700;
+            Items[8].Type = ItemType.Accessories;
+        }
 
     }
 }

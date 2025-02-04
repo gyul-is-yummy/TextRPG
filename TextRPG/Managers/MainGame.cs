@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using TextRPG.Models;
@@ -15,7 +16,7 @@ namespace TextRPG.Managers
         public MainGame()
         {
             player = new Player();
-            itemManager = new ItemManager();
+            itemManager = new ItemManager(player.Job);
 
             // Event 연결
             itemManager.BuyEvent += player.BuyItem;
@@ -44,7 +45,80 @@ namespace TextRPG.Managers
             return -1;
         }
 
-        // 게임 시작 화면
+        //이름을 입력받는 메서드
+        public void InputName()
+        {
+            Console.Clear();
+            Console.WriteLine("안녕하세요 용사님!");
+            Console.WriteLine("저는 용사님의 여정을 함께할 도우미 요정 솔라입니다.");
+
+            Console.WriteLine("\n용사님의 성함을 제게 알려주시겠어요?");
+
+            Console.WriteLine("\n1. 기억나지 않는다 | 2. 대충 둘러댄다 | 3. \"내 이름은...\" (이름 입력)");
+
+            // Console.Write(">> ");
+            int input = InputCheck(1, 3);
+
+            if (input == -1) InputName();
+            else if (input == 1)
+            {
+                Console.WriteLine("\n이럴수가! 그렇다면 어쩔 수 없죠...");
+                Console.WriteLine("용사님이 기억을 찾으실 때까지는 용사님이라고 부르겠습니다!");
+                player.Name = "용사님";
+                Thread.Sleep(2000);
+            }
+            else if (input == 2)
+            {
+                player.RandomName();
+                Console.WriteLine($"\n{player.Name} 용사님이시군요! 반가워요!");
+                Thread.Sleep(1000);
+            }
+            else
+            {
+                Console.Write("\n내 이름은... ");
+                player.Name = Console.ReadLine();
+
+                Console.WriteLine($"\" \n{player.Name} 용사님이시군요! 반가워요! \"");
+                Thread.Sleep(1000);
+            }
+        }
+
+
+        //직업 선택
+        public void SelectJob()
+        {
+            Console.Clear();
+            Console.WriteLine($"{player.Name} 님의 특기는 무엇인가요?");
+
+            Console.WriteLine($"\n1. 검술 | 2. 마법 | 3. 궁술");
+
+            int input = InputCheck(1, 3);
+
+            if (input == -1) SelectJob();
+            else if (input == 1)
+            {
+                player.Job = JobType.Warrior;
+                Console.Write("\n검술이라니!");
+            }     
+            else if (input == 2)
+            {
+                player.Job = JobType.Magician;
+                Console.Write("\n마법이라니!");
+            }
+            else
+            {
+                player.Job = JobType.Archer;
+                Console.Write("\n궁술이라니!");
+            }
+            
+            Console.Write(" 정말 멋진 특기를 가지고 계시네요!");
+
+            //플레이어 직업에 맞춰 상점 아이템 세팅
+            itemManager.SetItems(player.Job);
+            Thread.Sleep(1000);
+        }
+
+        // 게임 메인 화면
         public void GameStart()
         {
             Console.Clear();
@@ -70,7 +144,7 @@ namespace TextRPG.Managers
 
         }
 
-        // 플레이어 상태 확인
+        // 플레이어 상태 확인 Scene
         public void StatusCheck()
         {
 
@@ -79,7 +153,7 @@ namespace TextRPG.Managers
             Console.WriteLine("캐릭터의 정보가 표시됩니다.\n");
 
             Console.WriteLine($"Lv. {player.Level}");
-            Console.WriteLine($"{player.Name} ( {player.Job} )");
+            Console.WriteLine($"{player.Name} ({player.JobName})");
             Console.WriteLine($"공격력 : {player.Power} (+{player.ItemPow})");
             Console.WriteLine($"방어력 : {player.Defense} (+{player.ItemDef})");
             Console.WriteLine($"체 력 : {player.Hp}/{player.MaxHP}");
@@ -93,7 +167,7 @@ namespace TextRPG.Managers
 
         }
 
-        // 플레이어 인벤토리 확인
+        // 플레이어 인벤토리 Scene
         public void Inventory()
         {
 
@@ -116,7 +190,7 @@ namespace TextRPG.Managers
 
         }
 
-        //장비 장착 관리
+        //인벤토리 - 장착 관리 Scene
         public void EquipItem()
         {
             Console.Clear();
@@ -141,7 +215,7 @@ namespace TextRPG.Managers
             }
         }
 
-        //상점
+        //상점 Scene
         public void ItemShop()
         {
             Console.Clear();
@@ -169,8 +243,7 @@ namespace TextRPG.Managers
 
         }
 
-
-        //아이템 구매
+        //상점 - 아이템 구매 Scene
         public void ItemShop_Buy()
         {
             Console.Clear();
@@ -199,8 +272,7 @@ namespace TextRPG.Managers
 
         }
 
-
-        //아이템 판매
+        //상점 - 아이템 판매 Scene
         public void ItemShop_Sell()
         {
             Console.Clear();
@@ -230,7 +302,7 @@ namespace TextRPG.Managers
 
         }
 
-
+        //휴식하기 Scene
         public void Rest()
         {
             Console.Clear();
