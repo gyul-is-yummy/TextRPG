@@ -53,9 +53,6 @@ namespace TextRPG.Models
             }
         }
 
-
-
-
         //생성자
         public Dunjeon()
         {
@@ -71,7 +68,6 @@ namespace TextRPG.Models
                 //무조건 클리어 성공
                 return true;
             }
-
 
             Random rand = new Random();
             int probability = rand.Next(0, 100);

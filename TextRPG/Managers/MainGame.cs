@@ -70,7 +70,6 @@ namespace TextRPG.Managers
 
             Console.WriteLine("\n1. 기억나지 않는다 | 2. 대충 둘러댄다 | 3. \"내 이름은...\" (이름 입력)");
 
-            // Console.Write(">> ");
             int input = InputCheck(1, 3);
 
             if (input == -1) InputName();
@@ -163,12 +162,11 @@ namespace TextRPG.Managers
         // 플레이어 상태 확인 Scene
         public void StatusCheck()
         {
-
             Console.Clear();
             Console.WriteLine("상태 보기");
             Console.WriteLine("캐릭터의 정보가 표시됩니다.\n");
 
-            Console.WriteLine($"Lv. {player.Level}");
+            Console.WriteLine($"Lv. {player.Level} ({player.Exp}/{player.MaxExp})");
             Console.WriteLine($"{player.Name} ({player.JobName})");
             Console.WriteLine($"공격력 : {player.Power} (+{player.ItemPow})");
             Console.WriteLine($"방어력 : {player.Defense} (+{player.ItemDef})");
@@ -386,9 +384,19 @@ namespace TextRPG.Managers
                     player.Victory(dunjeon.Def, dunjeon.Gold);
                     dunjeon.DungeonClear(tempHp, player.Hp, tempGold, player.Gold);
 
-                    //경험치 증가
-                    player.Exp++;
+                    //플레이어의 체력이 0 이하가 될 경우 프로퍼티에서 isDie를 true로 변경
+                    //프로퍼티에서 바로 메서드를 실행하지 않은 이유: 순서가 꼬임...
+                    if (player.IsDie)
+                    {
+                        player.PlayerDie();
+                        player.Hp = 1;
+                    }
+                    else
+                    {
+                        player.Exp++;
+                    }
 
+                    player.IsDie = false;
                 }
                 else
                 {

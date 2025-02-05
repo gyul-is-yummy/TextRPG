@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace TextRPG.Models
         public float Power { get; set; }
         public float Defense { get; set; }
         public float MaxHP { get; private set; }
+        public bool IsDie { get; set; }
 
         private float hp;
         public float Hp
@@ -38,6 +40,7 @@ namespace TextRPG.Models
                 else if(hp < 0)
                 {
                     hp = 0;
+                    IsDie = true;
                 }
             }
         }
@@ -136,6 +139,8 @@ namespace TextRPG.Models
 
             ItemPow = 0f;
             ItemDef = 0f;
+
+            IsDie = false;
 
             tempName = new string[10]{ "올든",
                                        "세드릭",
@@ -289,6 +294,42 @@ namespace TextRPG.Models
         public void Defeat()
         {
             Hp -= (Hp / 2);
+        }
+
+        public void PlayerDie()
+        {
+            //Console.Clear();
+            Console.WriteLine("\n어라? 눈 앞이 흐려진다...");
+            Thread.Sleep(700);
+            Console.WriteLine("...");
+            Thread.Sleep(700);
+            Console.WriteLine("...");
+            Thread.Sleep(700);
+            Console.WriteLine("...");
+            Thread.Sleep(700);
+            Console.WriteLine($"{Name}님, 괜찮으세요?");
+            Thread.Sleep(700);
+            Console.WriteLine($"{Name}님은 던전 앞에서 정신을 잃은 채로 발견되셨어요!");
+            Thread.Sleep(700);
+            Console.WriteLine($"일단 급한대로 제가 여관으로 모셔왔지만...");
+            Thread.Sleep(700);
+            Console.WriteLine($"상태는 좀 괜찮으세요?\n");
+            Thread.Sleep(700);
+
+            Console.WriteLine($"...");
+            Thread.Sleep(700);
+            Console.WriteLine($"... 잘 기억이 나지 않는다...\n");
+            Thread.Sleep(800);
+
+            Console.WriteLine($"경험치 {Exp} 감소, 골드 500 감소");
+            
+
+            Exp = 0;
+            Gold -= 500;
+
+            Console.WriteLine("\n마을로 돌아가려면 아무 키나 누르십시오.");
+            Console.ReadKey();
+
         }
 
 

@@ -44,9 +44,8 @@ namespace TextRPG.Managers
             {
                 IsEquip[i] = false;
             }
-
         }
-
+        
 
         //상점에서 아이템 리스트를 보여주는 메서드
         public void ShowItemList(bool IsBuyMode)
@@ -82,7 +81,7 @@ namespace TextRPG.Managers
 
                 Console.Write(Items[i].ItemInfo);
 
-                Console.SetCursorPosition(103, top);
+                Console.SetCursorPosition(104, top);
                 Console.Write(" | ");
 
                 if (Items[i].State != ItemState.HaveNot)
@@ -90,7 +89,7 @@ namespace TextRPG.Managers
                 else
                 {
                     Console.Write(Items[i].Gold);
-                    Console.SetCursorPosition(111, top);
+                    Console.SetCursorPosition(112, top);
                     Console.WriteLine("G");
                 }
 
@@ -107,6 +106,7 @@ namespace TextRPG.Managers
         }
 
         //인벤토리를 보여주는 메서드
+        //판매시에도 이 메서드를 보여줌
         public void ShowInventory(bool IsEquipmentMode)
         {
             InventoryNumInit();
@@ -154,9 +154,17 @@ namespace TextRPG.Managers
                 Console.SetCursorPosition(38, top + count);
                 Console.Write("방어력 +{0}", Items[i].Defense);
 
+                Console.SetCursorPosition(48, top + count);
                 Console.Write(" | ");
 
                 Console.WriteLine(Items[i].ItemInfo);
+
+                Console.SetCursorPosition(107, top + count);
+                Console.Write(" | ");
+
+                Console.Write(Items[i].Gold);
+                Console.SetCursorPosition(115, top + count);
+                Console.WriteLine("G");
 
                 count++;
 
@@ -223,14 +231,11 @@ namespace TextRPG.Managers
                     Thread.Sleep(500);
                 }
 
-                //return HasEnoughGold;
-
             }
             else
             {
                 Console.WriteLine("\n이미 구매한 아이템입니다.");
                 Thread.Sleep(500);
-                //return false;
             }
         }
 
@@ -306,6 +311,7 @@ namespace TextRPG.Managers
         }
 
 
+        //플레이어의 직업에 따라 아이템을 세팅해주는 메서드
         public void SetItems(JobType playerJob)
         {
             if (playerJob == JobType.Warrior)
@@ -322,6 +328,7 @@ namespace TextRPG.Managers
             }
         }
 
+        // 전사 장비 세팅
         private void SetItemsForWarrior()
         {
             //전사 방어구
@@ -391,7 +398,7 @@ namespace TextRPG.Managers
             Items[8].Type = ItemType.Accessories;
         }
 
-
+        // 마법사 장비 세팅
         private void SetItemsForMagician()
         {
             //마법사 방어구
@@ -427,14 +434,14 @@ namespace TextRPG.Managers
             Items[4].Name = "멋들어진 케인";
             Items[4].Power = 5f;
             Items[4].Defense = 0f;
-            Items[4].ItemInfo = "성능과 디자인을 모두 잡은, 멋쟁이 마법사들의 필수 지팡이입니다.";
+            Items[4].ItemInfo = "성능과 디자인을 모두 잡은 멋쟁이 마법사 지팡이입니다.";
             Items[4].Gold = 1500;
             Items[4].Type = ItemType.Weapon;
 
             Items[5].Name = "스파르타의 스태프";
             Items[5].Power = 7f;
             Items[5].Defense = 0f;
-            Items[5].ItemInfo = "스파르타 소속 수석 마법사들이 사용했다는 전설의 스태프입니다.";
+            Items[5].ItemInfo = "스파르타 수석 마법사들이 사용했다는 전설의 스태프입니다.";
             Items[5].Gold = 2700;
             Items[5].Type = ItemType.Weapon;
 
@@ -461,10 +468,11 @@ namespace TextRPG.Managers
             Items[8].Type = ItemType.Accessories;
         }
 
+        // 궁수 장비 세팅
         private void SetItemsForArcher()
         {
             //궁수 방어구
-            Items[0].Name = "수련용 천옷";
+            Items[0].Name = "수련용 튜닉";
             Items[0].Power = 0f;
             Items[0].Defense = 5f;
             Items[0].ItemInfo = "가볍지만 질기고, 빨래가 쉬운 수련용 천옷입니다.";
