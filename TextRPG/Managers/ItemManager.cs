@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using TextRPG.Models;
+﻿using TextRPG.Models;
 
 namespace TextRPG.Managers
 {
     public class ItemManager
     {
-        public int OwnedItemCount { get; set; }
-        public int ItemCount { get; private set; }
-        public int ItemTypeCount { get; private set; }
+        public int OwnedItemCount { get; set; } //현재 소유 중인 아이템 갯수
+        public int ItemCount { get; private set; }  //전체 아이템 갯수
+        public int ItemTypeCount { get; private set; }  //장비 타입 갯수 (무기/방어구/악세서리)
 
         private Item[] Items { get; set; }  // 아이템 정보를 저장할 배열
-        public bool[] IsEquip { get; set; }
-
+        public bool[] IsEquip { get; set; } // 장비 타입별 착용 중인지 체크하는 변수
 
         //Event
         public event Func<int, bool> BuyEvent;           //장비 구매
@@ -25,7 +17,7 @@ namespace TextRPG.Managers
         public event Action<float, float> EquipEvent;    //장비 착용
         public event Action<float, float> UnequipEvent;  //장비 해제
 
-        //ItemManager생성자에서는 주로 아이템의 정보를 넣어줌
+
         public ItemManager(JobType playerJob)
         {
             OwnedItemCount = 0;                                             //소유 중인 아이템 갯수
@@ -102,20 +94,18 @@ namespace TextRPG.Managers
                 top++;
 
             }
-
         }
 
-        //인벤토리를 보여주는 메서드
-        //판매시에도 이 메서드를 보여줌
+
+        //보유 중인 아이템을 보여주는 메서드
+        //인벤토리, 장비 관리, 장비 판매에서 사용
         public void ShowInventory(bool IsEquipmentMode)
         {
-            InventoryNumInit();
-
             int top = Console.CursorTop;
             int count = 0;  //줄바꿈을 위한 count
 
-            //보유 중인 아이템을 전부 보여줍니다.
-            //이때 장착중인 아이템 앞에는 [E] 표시를 붙여 줍니다.
+            //보유 중인 아이템을 전부 보여준다.
+            //이때 장착중인 아이템 앞에는 [E] 표시를 붙여 준다.
             for (int i = 0; i < Items.Length; i++)
             {
                 if (Items[i].State == ItemState.HaveNot) continue;
@@ -171,10 +161,10 @@ namespace TextRPG.Managers
             }
         }
 
+
         //장비 착용 메서드
         public void WearEquipment(int select)
         {
-
             for (int i = 0; i < Items.Length; i++)
             {
                 //만약 선택한 Item이 아니라면 돌아가라
@@ -239,10 +229,10 @@ namespace TextRPG.Managers
             }
         }
 
+
         //아이템 판매
         public void SellItems(int select)
         {
-
             for (int i = 0; i < Items.Length; i++)
             {
                 //가지고 있지 않은 아이템이라면 돌려보내준다.
@@ -253,7 +243,7 @@ namespace TextRPG.Managers
                 {
                     //만약 착용중인 아이템을 판매한다면
                     if (Items[i].State == ItemState.Use)
-                        //판매하기 전 착용 해제 이벤트 실행
+                        //판매하기 전 착용 해제 이벤트 실행 (플레이어의 장비 해제 메서드)
                         UnequipEvent?.Invoke(Items[i].Power, Items[i].Defense);
 
                     //아이템의 상태를 보유X 상태로 변경
@@ -273,20 +263,22 @@ namespace TextRPG.Managers
 
                     //인벤토리 넘버 재부여
                     InventoryNumInit();
-
                     break;
                 }
             }
 
             Thread.Sleep(500);
-
         }
 
+
+        //인벤토리 넘버 초기화 메서드
+        //보유 아이템 갯수에 변화가 있을 때마다 사용한다. (구매/판매)
         public void InventoryNumInit()
         {
             int count = 1;
             for (int i = 0; i < Items.Length; i++)
             {
+
                 if (Items[i].State != ItemState.HaveNot)
                 {
                     Items[i].InventoryNum = count;
@@ -295,6 +287,8 @@ namespace TextRPG.Managers
             }
         }
 
+
+        //착용 중인 동일 타입 아이템을 찾아서 해제하는 메서드
         public void FindEquippedItems(ItemType searchType)
         {
             for (int i = 0; i < Items.Length; i++)
@@ -328,7 +322,7 @@ namespace TextRPG.Managers
             }
         }
 
-        // 전사 장비 세팅
+        // 전사 장비
         private void SetItemsForWarrior()
         {
             //전사 방어구
@@ -380,25 +374,25 @@ namespace TextRPG.Managers
             Items[6].Power = 3f;
             Items[6].Defense = 3f;
             Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
-            Items[6].Gold = 2700;
+            Items[6].Gold = 1000;
             Items[6].Type = ItemType.Accessories;
 
             Items[7].Name = "누군가의 은반지";
             Items[7].Power = 6f;
             Items[7].Defense = 6f;
             Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
-            Items[7].Gold = 2700;
+            Items[7].Gold = 2000;
             Items[7].Type = ItemType.Accessories;
 
             Items[8].Name = "스파르타의 허리띠";
             Items[8].Power = 9f;
             Items[8].Defense = 9f;
             Items[8].ItemInfo = "스파르타의 용사들이 사용했다는 전설의 허리띠입니다.";
-            Items[8].Gold = 2700;
+            Items[8].Gold = 3000;
             Items[8].Type = ItemType.Accessories;
         }
 
-        // 마법사 장비 세팅
+        // 마법사 장비
         private void SetItemsForMagician()
         {
             //마법사 방어구
@@ -450,25 +444,25 @@ namespace TextRPG.Managers
             Items[6].Power = 3f;
             Items[6].Defense = 3f;
             Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
-            Items[6].Gold = 2700;
+            Items[6].Gold = 1000;
             Items[6].Type = ItemType.Accessories;
 
             Items[7].Name = "누군가의 은반지";
             Items[7].Power = 6f;
             Items[7].Defense = 6f;
             Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
-            Items[7].Gold = 2700;
+            Items[7].Gold = 2000;
             Items[7].Type = ItemType.Accessories;
 
             Items[8].Name = "스파르타의 허리띠";
             Items[8].Power = 9f;
             Items[8].Defense = 9f;
             Items[8].ItemInfo = "스파르타의 용사들이 사용했다는 전설의 허리띠입니다.";
-            Items[8].Gold = 2700;
+            Items[8].Gold = 3000;
             Items[8].Type = ItemType.Accessories;
         }
 
-        // 궁수 장비 세팅
+        // 궁수 장비
         private void SetItemsForArcher()
         {
             //궁수 방어구
@@ -520,21 +514,21 @@ namespace TextRPG.Managers
             Items[6].Power = 3f;
             Items[6].Defense = 3f;
             Items[6].ItemInfo = "누군가의 기원이 깃든 목걸이입니다.";
-            Items[6].Gold = 2700;
+            Items[6].Gold = 1000;
             Items[6].Type = ItemType.Accessories;
 
             Items[7].Name = "누군가의 은반지";
             Items[7].Power = 6f;
             Items[7].Defense = 6f;
             Items[7].ItemInfo = "반지 뒤에 이니셜이 음각되어 있습니다.";
-            Items[7].Gold = 2700;
+            Items[7].Gold = 2000;
             Items[7].Type = ItemType.Accessories;
 
             Items[8].Name = "스파르타의 허리띠";
             Items[8].Power = 9f;
             Items[8].Defense = 9f;
             Items[8].ItemInfo = "스파르타의 용사들이 사용했다는 전설의 허리띠입니다.";
-            Items[8].Gold = 2700;
+            Items[8].Gold = 3000;
             Items[8].Type = ItemType.Accessories;
         }
 

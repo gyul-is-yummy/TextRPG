@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-public enum JobType
-{
-    Warrior,
-    Magician,
-    Archer
-}
-
-
+﻿
 namespace TextRPG.Models
 {
+    public enum JobType
+    {
+        Warrior,
+        Magician,
+        Archer
+    }
+
     public class Player
     {
         public string[] tempName;
@@ -54,9 +46,9 @@ namespace TextRPG.Models
             {
                 exp = value;
                 if (exp >= MaxExp)
-                {
-                    LevelUp();
+                { 
                     MaxExp++;
+                    LevelUp();
                 }
             }
         }
@@ -90,7 +82,6 @@ namespace TextRPG.Models
         public JobType Job
         {
             get { return job; }
-
             set
             {
                 //JobType이 설정될 때 JobName과 스탯들도 함께 설정되도록 한다.
@@ -98,14 +89,13 @@ namespace TextRPG.Models
                 JobName = jobName;
                 SetStats();
             }
-
         }
 
         private string jobName;
         public string JobName
         {
             get { return jobName; }
-
+            //출력을 위한 직업별 string 값 설정
             private set
             {
                 if (job == JobType.Warrior)
@@ -123,6 +113,8 @@ namespace TextRPG.Models
             }
         }
 
+
+
         //플레이어 생성자
         public Player()
         {
@@ -135,7 +127,7 @@ namespace TextRPG.Models
             MaxExp = 1;
             Exp = 0;
             JobName = "직업";
-            Gold = 100000;
+            Gold = 1000;
 
             ItemPow = 0f;
             ItemDef = 0f;
@@ -155,6 +147,7 @@ namespace TextRPG.Models
 
         }
 
+        //직업에 따라 플레이어의 스탯을 설정하는 메서드
         private void SetStats()
         {
             switch (job)
@@ -262,11 +255,9 @@ namespace TextRPG.Models
 
         }
 
-
         //던전 클리어시 호출되는 메서드
         public void Victory(float dunjeonDef, int dunjeonGold)
         {
-
             //<체력 감소>
             Random rand = new Random();
             int temp = (int)(Defense - dunjeonDef);
@@ -280,14 +271,12 @@ namespace TextRPG.Models
             if (damage < 0) damage = 0;
             Hp -= damage;
 
-
             //<골드 증가>
             //공격력 추가보상: 공격력~공격력*2 % 값만큼 보너스 골드
             temp = rand.Next((int)(Power), (int)(Power * 2));
             float bonus = dunjeonGold * (temp * 0.01f);
 
             Gold += (int)(dunjeonGold + bonus);
-
         }
 
         //던전 공략 실패시 호출되는 메서드
@@ -296,42 +285,41 @@ namespace TextRPG.Models
             Hp -= (Hp / 2);
         }
 
+        //던전 공략 중 플레이어 사망시 호출되는 메서드
         public void PlayerDie()
         {
-            //Console.Clear();
             Console.WriteLine("\n어라? 눈 앞이 흐려진다...");
             Thread.Sleep(700);
             Console.WriteLine("...");
             Thread.Sleep(700);
             Console.WriteLine("...");
             Thread.Sleep(700);
-            Console.WriteLine("...");
+            Console.WriteLine("...\n");
             Thread.Sleep(700);
-            Console.WriteLine($"{Name}님, 괜찮으세요?");
+            Console.WriteLine($"\"{Name}님, 괜찮으세요?\"\n");
             Thread.Sleep(700);
-            Console.WriteLine($"{Name}님은 던전 앞에서 정신을 잃은 채로 발견되셨어요!");
+            Console.WriteLine($"\"{Name}님은 던전 앞에서 정신을 잃은 채로 발견되셨어요!\"\n");
             Thread.Sleep(700);
-            Console.WriteLine($"일단 급한대로 제가 여관으로 모셔왔지만...");
+            Console.WriteLine($"\"일단 급한대로 제가 여관으로 모셔왔지만...\"\n");
             Thread.Sleep(700);
-            Console.WriteLine($"상태는 좀 괜찮으세요?\n");
+            Console.WriteLine($"\"상태는 좀 괜찮으세요?\"\n");
             Thread.Sleep(700);
 
             Console.WriteLine($"...");
             Thread.Sleep(700);
-            Console.WriteLine($"... 잘 기억이 나지 않는다...\n");
+            Console.WriteLine($"...");
+            Thread.Sleep(700);
+            Console.WriteLine($"...... 잘 기억이 나지 않는다...\n");
             Thread.Sleep(800);
 
-            Console.WriteLine($"경험치 {Exp} 감소, 골드 500 감소");
-            
-
+            Console.WriteLine($"[경험치 {Exp} 감소, 골드 500 감소]\n");
+           
             Exp = 0;
             Gold -= 500;
 
-            Console.WriteLine("\n마을로 돌아가려면 아무 키나 누르십시오.");
+            Console.WriteLine("\n계속하려면 아무 키나 눌러주세요. . .");
             Console.ReadKey();
 
         }
-
-
     }
 }

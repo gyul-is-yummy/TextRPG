@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Numerics;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using TextRPG.Models;
+﻿using TextRPG.Models;
 
 namespace TextRPG.Managers
 {
@@ -29,14 +23,6 @@ namespace TextRPG.Managers
             itemManager.SellEvent += player.SellItem;
             itemManager.EquipEvent += player.UseItem;
             itemManager.UnequipEvent += player.DisuseItem;
-
-            //DungeonClearEvent += player.Victory;
-            //DungeonClearEvent += dunjeon.DungeonClear;
-
-            //DungeonFailEvent += player.Defeat;
-            //DungeonFailEvent += dunjeon.DungeonFail;
-
-
         }
 
         //키 입력을 받고 올바른 입력인지 체크하는 메서드
@@ -77,22 +63,33 @@ namespace TextRPG.Managers
             {
                 Console.WriteLine("\n이럴수가! 그렇다면 어쩔 수 없죠...");
                 Console.WriteLine("용사님이 기억을 찾으실 때까지는 용사님이라고 부르겠습니다!");
-                player.Name = "용사님";
+                player.Name = "용사";
                 Thread.Sleep(2000);
             }
             else if (input == 2)
             {
                 player.RandomName();
-                Console.WriteLine($"\n{player.Name} 용사님이시군요! 반가워요!");
+                Console.WriteLine($"\n{player.Name}님이시군요! 반가워요!");
                 Thread.Sleep(1000);
             }
             else
             {
-                Console.Write("\n내 이름은... ");
+                Console.Write("\n\"내 이름은... ");
+
+                //커서 위치 저장
+                int left = Console.CursorLeft;
+                int top = Console.CursorTop;
+
+                //이름 입력
                 player.Name = Console.ReadLine();
 
-                Console.WriteLine($"\" \n{player.Name} 용사님이시군요! 반가워요! \"");
-                Thread.Sleep(1000);
+                //받아온 커서 위치에 이어서 출력할 수 있도록 함.
+                Console.SetCursorPosition(left, top);
+                Console.WriteLine($"{player.Name}(이)라고 해.\"");
+
+                Console.WriteLine($"\n\"{player.Name}님이시군요! 반가워요! \"");
+
+                Thread.Sleep(2000);
             }
         }
 
@@ -170,8 +167,8 @@ namespace TextRPG.Managers
             Console.WriteLine($"{player.Name} ({player.JobName})");
             Console.WriteLine($"공격력 : {player.Power} (+{player.ItemPow})");
             Console.WriteLine($"방어력 : {player.Defense} (+{player.ItemDef})");
-            Console.WriteLine($"체 력 : {player.Hp}/{player.MaxHP}");
-            Console.WriteLine($"Gold : {player.Gold} G");
+            Console.WriteLine($"체 력  : {player.Hp}/{player.MaxHP}");
+            Console.WriteLine($"Gold   : {player.Gold} G");
 
             Console.WriteLine("\n0. 나가기");
             int input = InputCheck(0, 0);
@@ -184,7 +181,6 @@ namespace TextRPG.Managers
         // 플레이어 인벤토리 Scene
         public void Inventory()
         {
-
             Console.Clear();
             Console.WriteLine("인벤토리");
             Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.\n");
@@ -192,7 +188,7 @@ namespace TextRPG.Managers
             Console.WriteLine("[아이템 목록]");
 
             //인벤토리 호출
-            itemManager.ShowInventory( false);
+            itemManager.ShowInventory(false);
 
             Console.WriteLine("\n1. 장착 관리");
             Console.WriteLine("0. 나가기");
@@ -201,7 +197,6 @@ namespace TextRPG.Managers
             if (input == -1) Inventory();
             else if (input == 1) EquipItem();
             else GameStart();
-
         }
 
         //인벤토리 - 장착 관리 Scene
@@ -310,10 +305,8 @@ namespace TextRPG.Managers
             else
             {
                 itemManager.SellItems(input);
-                
                 ItemShop_Sell();
             }
-
         }
 
         //휴식하기 Scene
@@ -329,7 +322,8 @@ namespace TextRPG.Managers
             int input = InputCheck(0, 1);
 
             if (input == -1) Rest();
-            else if (input == 1)
+            else if(input == 0) GameStart();
+            else
             {
                 //만약 충분한 골드를 가지고 있다면
                 if(player.HasEnoughGold(500))
@@ -345,11 +339,9 @@ namespace TextRPG.Managers
                     Thread.Sleep(500);
                 }
 
+                //휴식 후 메인 화면으로 돌아감
                 GameStart();
             }
- 
-            else GameStart(); 
-
         }
 
         //던전입장 Scene
@@ -358,7 +350,15 @@ namespace TextRPG.Managers
             Console.Clear();
             Console.WriteLine("던전입장");
             Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.\n");
-            Console.WriteLine("1. 쉬운 던전\t| 방어력 5 이상 권장");
+
+            //현재 본인 상태를 확인하고 난이도를 선택할 수 있도록 함
+            Console.WriteLine($"[현재 {player.Name}의 상태]");
+            Console.WriteLine($"Lv. {player.Level} ({player.Exp}/{player.MaxExp})");
+            Console.WriteLine($"체력   : {player.Hp}/{player.MaxHP}");
+            Console.WriteLine($"공격력 : {player.Power} (+{player.ItemPow})");
+            Console.WriteLine($"방어력 : {player.Defense} (+{player.ItemDef})");
+
+            Console.WriteLine("\n1. 쉬운 던전\t| 방어력 5 이상 권장");
             Console.WriteLine("2. 일반 던전\t| 방어력 11 이상 권장");
             Console.WriteLine("3. 어려운 던전\t| 방어력 17 이상 권장");
 
@@ -369,7 +369,7 @@ namespace TextRPG.Managers
             else if (input == 0) GameStart();
             else
             {
-                //입력한 난이도 설정
+                //입력받은 input으로 난이도 설정
                 dunjeon.Level = (DunjeonType)input;
 
                 //플레이어의 기존 소지금/체력 저장
@@ -379,25 +379,36 @@ namespace TextRPG.Managers
                 //던전 클리어 여부 체크
                 bool isClear = dunjeon.ClearCheck(player.Defense);
 
+                //만약 클리어했다면
                 if (isClear)
                 {
                     player.Victory(dunjeon.Def, dunjeon.Gold);
                     dunjeon.DungeonClear(tempHp, player.Hp, tempGold, player.Gold);
 
-                    //플레이어의 체력이 0 이하가 될 경우 프로퍼티에서 isDie를 true로 변경
-                    //프로퍼티에서 바로 메서드를 실행하지 않은 이유: 순서가 꼬임...
+                    //던전 공략중에 플레이어가 쓰러졌다면
                     if (player.IsDie)
                     {
+                        /*
+                        IsDie: 플레이어의 체력이 0 이하가 될 경우 프로퍼티에서 isDie를 true로 변경
+                        프로퍼티에서 바로 PlayerDie()를 실행하지 않은 이유: 순서가 꼬임...
+                        */
+
+                        //기절 스크립트를 출력하고 HP를 1로 만들어준다.
                         player.PlayerDie();
                         player.Hp = 1;
+                        player.IsDie = false;
+
+                        //메인 화면으로
+                        GameStart();
                     }
+                    //죽지 않았다면
                     else
                     {
+                        //경험치를 증가 시켜준다.
                         player.Exp++;
                     }
-
-                    player.IsDie = false;
                 }
+                //클리어하지 못했다면
                 else
                 {
                     player.Defeat();
@@ -406,16 +417,7 @@ namespace TextRPG.Managers
 
                 Thread.Sleep(2000);
                 EnterDungeon();
-
             }
         }
-
-        //던전 내부 Scene
-        public void DungeonBattle()
-        {
-
-
-        }
-
     }
 }

@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-public enum DunjeonType
-{
-    Easy = 1,
-    Nomal = 2,
-    Hard = 3
-}
-
+﻿
 namespace TextRPG.Models
 {
+    public enum DunjeonType
+    {
+        Easy = 1,
+        Nomal = 2,
+        Hard = 3
+    }
+
     public class Dunjeon
     {
         public float Def { get; set; }
@@ -25,8 +20,7 @@ namespace TextRPG.Models
             set
             {
                 //난이도가 입력될 때마다
-                //권장 방어력과 보상 골드가 달라진다.
-
+                //그 난이도에 맞는 권장 방어력과 보상 골드를 설정한다.
                 if (value == DunjeonType.Easy)
                 {
                     Def = 5f;
@@ -49,14 +43,7 @@ namespace TextRPG.Models
                 {
                     Console.WriteLine("던전 level 입력 오류");
                 }
-
             }
-        }
-
-        //생성자
-        public Dunjeon()
-        {
-
         }
 
         //던전 공략을 성공/실패하는지 체크하는 메서드
@@ -69,6 +56,7 @@ namespace TextRPG.Models
                 return true;
             }
 
+            //0~99의 랜덤한 숫자를 생성
             Random rand = new Random();
             int probability = rand.Next(0, 100);
 
@@ -98,7 +86,6 @@ namespace TextRPG.Models
             Console.WriteLine($"Gold\t{gold} G -> {currentGold} G");
         }
 
-
         //던전 공략 실패시 출력
         public void DungeonFail(float hp, float currentHp)
         {
@@ -108,7 +95,5 @@ namespace TextRPG.Models
             Console.WriteLine("[탐험 결과]");
             Console.WriteLine($"HP\t{hp} -> {currentHp}");
         }
-
-
     }
 }
